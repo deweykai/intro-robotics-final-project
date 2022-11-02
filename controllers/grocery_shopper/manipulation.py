@@ -23,10 +23,36 @@ class Grippers:
         self.right_finger = robot.robot_parts["gripper_right_finger_joint"]
 
 
+class ManualController:
+    """Keyboard control robot controller"""
+
+    def update(self):
+        key = keyboard.getKey()
+        if key == keyboard.LEFT:
+            wheels.vL = -robot.MAX_SPEED
+            wheels.vR = robot.MAX_SPEED
+        elif key == keyboard.RIGHT:
+            wheels.vL = robot.MAX_SPEED
+            wheels.vR = -robot.MAX_SPEED
+        elif key == keyboard.UP:
+            wheels.vL = robot.MAX_SPEED
+            wheels.vR = robot.MAX_SPEED
+        elif key == keyboard.DOWN:
+            wheels.vL = -robot.MAX_SPEED
+            wheels.vR = -robot.MAX_SPEED
+        elif key == ord(' '):
+            wheels.vL = 0
+            wheels.vR = 0
+        else:  # slow down
+            wheels.vL *= 0.75
+            wheels.vR *= 0.75
+
+
 gripper_status = "closed"
 
 wheels = WheelMotors()
 grippers = Grippers()
+controller = ManualController()
 
 
 def init():
@@ -39,7 +65,7 @@ def update():
     """Update hook for manipulation module"""
 
     global gripper_status
-    global wheels
+    controller.update()
     wheels.update()
 
     if gripper_status == "open":
@@ -55,24 +81,3 @@ def update():
 
         if robot.left_gripper_enc.getValue() >= 0.044:
             gripper_status = "open"
-
-    # keyboard input:
-    key = keyboard.getKey()
-    if key == keyboard.LEFT:
-        wheels.vL = -robot.MAX_SPEED
-        wheels.vR = robot.MAX_SPEED
-    elif key == keyboard.RIGHT:
-        wheels.vL = robot.MAX_SPEED
-        wheels.vR = -robot.MAX_SPEED
-    elif key == keyboard.UP:
-        wheels.vL = robot.MAX_SPEED
-        wheels.vR = robot.MAX_SPEED
-    elif key == keyboard.DOWN:
-        wheels.vL = -robot.MAX_SPEED
-        wheels.vR = -robot.MAX_SPEED
-    elif key == ord(' '):
-        wheels.vL = 0
-        wheels.vR = 0
-    else:  # slow down
-        wheels.vL *= 0.75
-        wheels.vR *= 0.75
