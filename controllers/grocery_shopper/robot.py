@@ -1,6 +1,11 @@
+"""Robot definitions
+
+This module contains variables used by the robot.
+This module also initializes various robot devices
+to be used by the rest of the controller.
+"""
 
 from controller import Robot
-import math
 
 # Initialization
 print("=== Initializing Grocery Shopper...")

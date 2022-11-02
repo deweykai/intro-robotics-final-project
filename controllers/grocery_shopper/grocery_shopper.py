@@ -10,10 +10,6 @@ import manipulation
 import navigation
 
 
-# ------------------------------------------------------------------
-# Helper Functions
-
-
 # init modules
 robot.step(timestep) != -1
 mapping.init()

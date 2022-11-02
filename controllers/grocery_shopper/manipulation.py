@@ -1,3 +1,8 @@
+"""Robot manipulation
+
+This robot controls all aspects the movement of the robot
+"""
+
 import robot
 from robot import keyboard
 
@@ -25,10 +30,14 @@ grippers = Grippers()
 
 
 def init():
+    """Initialize manipulation module"""
+
     pass
 
 
 def update():
+    """Update hook for manipulation module"""
+
     global gripper_status
     global wheels
     wheels.update()

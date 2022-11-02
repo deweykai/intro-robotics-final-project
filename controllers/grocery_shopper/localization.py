@@ -1,3 +1,9 @@
+"""Robot localization
+
+This module provide information of the spatial position of the robot
+"""
+
+
 import math
 from robot import gps, compass
 
@@ -22,10 +28,12 @@ positioning = GPS()
 
 
 def init():
+    """Initialize localization module"""
+
     pass
 
 
 def update():
-    positioning.update()
+    """Update hook for localization module"""
 
-    print(pose_x, pose_y)
+    positioning.update()

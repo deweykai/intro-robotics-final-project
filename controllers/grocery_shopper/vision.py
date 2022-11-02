@@ -1,3 +1,9 @@
+"""Vision Processing
+
+This module take vision sensor data and processes into a more usable format
+"""
+
+
 import numpy as np
 import math
 
@@ -14,8 +20,12 @@ lidar_offsets = lidar_offsets[83:len(lidar_offsets)-83]
 
 
 def init():
+    """Initialize vision module"""
+
     pass
 
 
 def update():
+    """Update hook for vision module"""
+
     pass
