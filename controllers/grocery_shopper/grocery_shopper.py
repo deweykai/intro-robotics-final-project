@@ -12,16 +12,16 @@ import navigation
 
 # init modules
 robot.step(timestep) != -1
-localization.init()
 vision.init()
+localization.init()
 mapping.init()
 navigation.init()
 manipulation.init()
 
 # Main Loop
 while robot.step(timestep) != -1:
-    localization.update()
     vision.update()
+    localization.update()
     mapping.update()
     navigation.update()
     manipulation.update()
