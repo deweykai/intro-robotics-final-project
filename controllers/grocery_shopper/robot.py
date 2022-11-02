@@ -61,5 +61,9 @@ lidar = robot.getDevice('Hokuyo URG-04LX-UG01')
 lidar.enable(timestep)
 lidar.enablePointCloud()
 
+# We are using a keyboard to remote control the robot
+keyboard = robot.getKeyboard()
+keyboard.enable(timestep)
+
 # Enable display
 display = robot.getDevice("display")
