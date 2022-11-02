@@ -3,6 +3,19 @@
 This module contains variables used by the robot.
 This module also initializes various robot devices
 to be used by the rest of the controller.
+
+This module provides devices:
+    * robot - instance of webots robot controller
+    * timestep - webots timestep
+    * robot_parts - a dictionary of robot joints including head, torso, arm, wheel, and grippers.
+    * left_gripper_enc - left gripper encoder
+    * right_gripper_enc - right gripper encoder
+    * camera - instance of camera device
+    * gps - gps device
+    * compass - compass device
+    * lidar - instance of lidar sensor
+    * keyboard - receiver for keybord inputs
+    * display - webots display device
 """
 
 from controller import Robot

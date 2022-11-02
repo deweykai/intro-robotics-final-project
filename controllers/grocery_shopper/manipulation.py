@@ -1,6 +1,10 @@
 """Robot manipulation
 
 This robot controls all aspects the movement of the robot
+
+This module depends on:
+    * localization
+    * navigation
 """
 
 import robot

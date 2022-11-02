@@ -1,6 +1,12 @@
 """Vision Processing
 
 This module take vision sensor data and processes into a more usable format
+
+This file provides:
+    * lidar_hits - list of (x,y) coordinates where lidar
+
+This module depends on:
+    * localization - for caluclating the position of lidar_hits
 """
 
 

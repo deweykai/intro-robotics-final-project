@@ -1,6 +1,11 @@
 """Robot localization
 
-This module provide information of the spatial position of the robot
+This module provide information of the spatial position of the robot.
+    
+This file provides variables:
+    * pose_x - x position of robot
+    * pose_y - y position of robot
+    * pose_theta - ground rotation of robot
 """
 
 
