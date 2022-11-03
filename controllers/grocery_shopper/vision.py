@@ -34,4 +34,5 @@ def init():
 def update():
     """Update hook for vision module"""
 
+    # TODO: process lider readings into lider_hits
     pass

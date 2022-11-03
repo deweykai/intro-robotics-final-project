@@ -9,6 +9,9 @@ This module depends on:
 
 import robot
 from robot import keyboard
+import mapping
+
+# TODO: Implement IK navigation
 
 
 class WheelMotors:
@@ -47,6 +50,10 @@ class ManualController:
         elif key == ord(' '):
             wheels.vL = 0
             wheels.vR = 0
+        elif key == ord('S'):
+            mapping.mapper.save()
+        elif key == ord('L'):
+            mapping.mapper.load()
         else:  # slow down
             wheels.vL *= 0.75
             wheels.vR *= 0.75
