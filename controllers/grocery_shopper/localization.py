@@ -25,7 +25,9 @@ class GPS:
         pose_y = gps.getValues()[1]
 
         n = compass.getValues()
-        rad = ((math.atan2(n[0], -n[2])))
+
+        # F compass coords are different from lab 5
+        rad = ((math.atan2(n[0], n[1])))
         pose_theta = rad
 
 
