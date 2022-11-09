@@ -1,0 +1,7 @@
+# Hello
+
+## Map
+
+Load map data with `L` while in control. `Loading map...` should appear in the console.
+
+Save map data with `S` while in control `Saving map...` should appear in the console.
