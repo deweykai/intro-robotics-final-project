@@ -13,7 +13,7 @@ This module depends on:
 import numpy as np
 import localization as loc
 import math
-from robot import lidar
+from robot import lidar, camera
 
 LIDAR_ANGLE_BINS = 667
 # The sensor is so low it often hits the ground
@@ -24,7 +24,7 @@ LIDAR_ANGLE_RANGE = math.radians(240)
 lidar_offsets = np.linspace(+LIDAR_ANGLE_RANGE /
                             2., -LIDAR_ANGLE_RANGE/2., LIDAR_ANGLE_BINS)
 # Only keep lidar readings not blocked by robot chassis
-lidar_offsets = lidar_offsets[83:len(lidar_offsets)-83]
+lidar_offsets = lidar_offsets[83: len(lidar_offsets) - 83]
 
 
 def get_lidar_readings():
@@ -51,14 +51,33 @@ def get_lidar_readings():
     return readings
 
 
+global color_ranges
+
+
+def check_if_color_in_range(bgr_tuple):
+    """
+    @param bgr_tuple: Tuple of BGR values
+    @returns Boolean: True if bgr_tuple is in any of the color ranges specified in color_ranges
+    """
+    for entry in color_ranges:
+        lower, upper = entry[0], entry[1]
+        in_range = True
+        for i in range(len(bgr_tuple)):
+            if bgr_tuple[i] < lower[i] or bgr_tuple[i] > upper[i]:
+                in_range = False
+                break
+        if in_range:
+            return True
+    return False
+
+
 def init():
     """Initialize vision module"""
-
+    # print(camera)
     pass
 
 
 def update():
     """Update hook for vision module"""
-
     # TODO: process lider readings into lider_hits
     pass
