@@ -18,6 +18,7 @@ This module depends on:
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from robot import display, DISPLAY_DIM
 from vision import get_lidar_readings
 import localization as loc
@@ -82,10 +83,11 @@ class ManualMapper:
         """Process raw_map then save to map_data"""
 
         raw_map = self.raw_map.copy()
-        # TODO: save map data
 
         global map_data, dirty
-        map_data = raw_map
+        map_data = (raw_map > 0.7) * 1
+        plt.imshow(map_data)
+        plt.show()
         dirty = True
 
     def load(self):
@@ -102,6 +104,8 @@ class ManualMapper:
                 display.setColor(color)
                 # display is adjusted so the orientation matches viewport window
                 display.drawPixel(DISPLAY_DIM - y, DISPLAY_DIM - x)
+
+        self.update_map_data()
 
     def save(self):
         """Save internal raw map data to file `raw_map.npy`"""
