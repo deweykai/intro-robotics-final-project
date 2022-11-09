@@ -18,11 +18,31 @@ This module depends on:
 """
 
 import numpy as np
+from robot import display, DISPLAY_DIM
+from vision import get_lidar_readings
+import localization as loc
 
-map_width = 10
-map_height = 10
+WORLD_MIN_X = -15
+WORLD_MAX_X = 15
+WORLD_MIN_Y = -8
+WORLD_MAX_Y = 8
+
+
+map_width = DISPLAY_DIM
+map_height = DISPLAY_DIM
 map_data = np.zeros((map_width, map_height))
 dirty = False
+
+
+def coords_world_to_map(pos):
+    x, y = pos
+    new_x = int((x / (WORLD_MAX_X - WORLD_MIN_X) + 0.5) * DISPLAY_DIM)
+    new_y = int((y / (WORLD_MAX_X - WORLD_MIN_X) + 0.5) * DISPLAY_DIM)
+    if new_x < 0 or new_x >= DISPLAY_DIM:
+        raise Exception('x out of bounds')
+    if new_y < 0 or new_y >= DISPLAY_DIM:
+        raise Exception('y out of bounds')
+    return new_x, new_y
 
 
 class ManualMapper:
@@ -31,14 +51,37 @@ class ManualMapper:
 
     def update(self):
         """Update internal raw map data"""
-        # TODO: update internal map data
-        # TODO: show internal map on robot display
+        readings = get_lidar_readings()
+        try:
+            readings = [coords_world_to_map(pos) for pos in readings]
+        except Exception as e:
+            print(e)
+
+        for x, y in readings:
+            # gray scale lidar readings
+            g = self.raw_map[y][x] + 5e-3
+            g = self.raw_map[y][x] = max(0, min(1, g))
+
+            color = int((int(g * 254) << 16) +
+                        (int(g * 254) << 8) + int(g * 254))
+
+            display.setColor(color)
+            # display is adjusted so the orientation matches viewport window
+            display.drawPixel(DISPLAY_DIM - y, DISPLAY_DIM - x)
+
+        try:
+            robot_x, robot_y = coords_world_to_map((loc.pose_x, loc.pose_y))
+            # Draw the robot's current pose on the 360x360 display
+            display.setColor(int(0xFF0000))
+            # display is adjusted so the orientation matches viewport window
+            display.drawPixel(DISPLAY_DIM - robot_y, DISPLAY_DIM - robot_x)
+        except Exception as e:
+            print(e)
 
     def update_map_data(self):
         """Process raw_map then save to map_data"""
 
         raw_map = self.raw_map.copy()
-
         # TODO: save map data
 
         global map_data, dirty
@@ -49,13 +92,22 @@ class ManualMapper:
         """Load raw map data from `raw_map.npy`"""
 
         print('Loading map...')
-        # TODO: load map from file
+        self.raw_map = np.load('raw_map.npy')
+        for y in range(DISPLAY_DIM):
+            for x in range(DISPLAY_DIM):
+                g = self.raw_map[y][x]
+                color = int((int(g * 254) << 16) +
+                            (int(g * 254) << 8) + int(g * 254))
+
+                display.setColor(color)
+                # display is adjusted so the orientation matches viewport window
+                display.drawPixel(DISPLAY_DIM - y, DISPLAY_DIM - x)
 
     def save(self):
         """Save internal raw map data to file `raw_map.npy`"""
 
         print('Saving map...')
-        # TODO: save map from file
+        np.save('raw_map.npy', self.raw_map)
 
 
 mapper = ManualMapper()

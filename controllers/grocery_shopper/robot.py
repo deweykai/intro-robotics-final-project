@@ -85,3 +85,4 @@ keyboard.enable(timestep)
 
 # Enable display
 display = robot.getDevice("display")
+DISPLAY_DIM = 360
