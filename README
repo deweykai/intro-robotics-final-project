@@ -1,5 +1,9 @@
 # Hello
 
+## Autonomous
+
+Enter autonomous mode from manual mode with `A`. Robot will automatically return to manual mode once navigation finishes.
+
 ## Map
 
 Load map data with `L` while in control. `Loading map...` should appear in the console.

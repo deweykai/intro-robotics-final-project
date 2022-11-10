@@ -14,6 +14,7 @@ import navigation
 import localization as loc
 import numpy as np
 
+DEBUG = True
 
 class WheelMotors:
     def __init__(self):
@@ -132,13 +133,15 @@ class IKController:
 
         vL = vL * robot.MAX_SPEED  # convert to rotational vel
         vR = vR * robot.MAX_SPEED  # convert to rotational vel
-        print('==== NAVIGATION FRAME ===')
-        print(f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
-        print(f'target = {self.target_pos()}')
-        print(f'rho = {rho}')
-        print(f'alpha = {alpha}')
-        print(f'vL = {vL}')
-        print(f'vR = {vL}')
+
+        if DEBUG:
+            print('==== NAVIGATION FRAME ===')
+            print(f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
+            print(f'target = {self.target_pos()}')
+            print(f'rho = {rho}')
+            print(f'alpha = {alpha}')
+            print(f'vL = {vL}')
+            print(f'vR = {vL}')
 
         # Normalize wheelspeed
         # (Keep the wheel speeds a bit less than the actual platform MAX_SPEED to minimize jerk)

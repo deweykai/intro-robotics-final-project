@@ -15,6 +15,7 @@ from scipy.signal import convolve2d
 import matplotlib.pyplot as plt
 
 CONV_SIZE = 15
+DEBUG = False
 
 # TODO: Implement RRT path finding
 waypoints = []
@@ -101,12 +102,13 @@ def update():
 
         path = a_star(adj_map, start_p, end_p)
 
-        # plt.imshow(adj_map)
-        # plt.gca().invert_yaxis()
-        # x = np.array([a[0] for a in path])
-        # y = np.array([a[1] for a in path])
-        # plt.scatter(x, y)
-        # plt.show()
+        if DEBUG:
+            plt.imshow(adj_map)
+            plt.gca().invert_yaxis()
+            x = np.array([a[0] for a in path])
+            y = np.array([a[1] for a in path])
+            plt.scatter(x, y)
+            plt.show()
 
         waypoints = [mapping.coords_map_to_world(pos) for pos in path]
         print('waypoints loaded')
