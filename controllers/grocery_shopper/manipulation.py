@@ -10,8 +10,9 @@ This module depends on:
 import robot
 from robot import keyboard
 import mapping
-
-# TODO: Implement IK navigation
+import navigation
+import localization as loc
+import numpy as np
 
 
 class WheelMotors:
@@ -32,6 +33,9 @@ class Grippers:
 
 class ManualController:
     """Keyboard control robot controller"""
+
+    def __init__(self) -> None:
+        print('Starting manual controls')
 
     def update(self):
         key = keyboard.getKey()
@@ -54,10 +58,91 @@ class ManualController:
             mapping.mapper.save()
         elif key == ord('L'):
             mapping.mapper.load()
+        elif key == ord('A'):
+            global controller
+            controller = IKController(navigation.waypoints)
         else:  # slow down
             wheels.vL *= 0.75
             wheels.vR *= 0.75
 
+
+class IKController:
+    """Inverse Kinematics Controller"""
+
+    def __init__(self, waypoints) -> None:
+        self.waypoints = waypoints
+        self.checkpoint = 0
+
+    def target_reached(self):
+        return self.checkpoint >= len(self.waypoints)
+
+    def target_pos(self):
+        if self.target_reached():
+            # reached target position
+            return loc.pose_x, loc.pose_y
+        else:
+            return self.waypoints[self.checkpoint]
+
+    def calculate_position_error(self):
+        target_x, target_y = self.target_pos()
+        return np.sqrt((loc.pose_x - target_x)**2 + (loc.pose_y - target_y)**2)
+
+
+    def calculate_bearing_error(self):
+        target_x, target_y = self.target_pos()
+        dx, dy = target_x - loc.pose_x, target_y - loc.pose_y
+        theta = np.arctan2(dy, dx)
+        return theta - loc.pose_theta
+
+    def update(self):
+        if self.target_reached():
+            global controller
+            controller = ManualController()
+            return 
+
+        def inverse_kinematics(dx, theta):
+            L = dx - theta * robot.AXLE_LENGTH / 2
+            R = dx + theta * robot.AXLE_LENGTH / 2
+            return L, R
+
+        def balance_values(vL, vR):
+            '''normalize vL, vR to -1 to 1'''
+            max_value = max(abs(vL), abs(vR))
+            max_value = max(max_value, robot.MAX_SPEED)
+            vR = vR / max_value
+            vL = vL / max_value
+            return vL, vR
+
+        rho = self.calculate_position_error()
+        alpha = self.calculate_bearing_error()
+
+        # check if it has hit the waypoint
+        if rho < 0.5:
+            print(f'hit waypoint {self.checkpoint}')
+            self.checkpoint += 10
+            return
+
+        # STEP 2: Controller
+        dx = 3 * rho
+        dtheta = 10 * alpha
+
+        # STEP 3: Compute wheelspeeds
+        vL, vR = inverse_kinematics(dx, dtheta)
+        vL, vR = balance_values(vL, vR)  # normalize values between -1 to 1
+
+        vL = vL * robot.MAX_SPEED  # convert to rotational vel
+        vR = vR * robot.MAX_SPEED  # convert to rotational vel
+        print('==== NAVIGATION FRAME ===')
+        print(f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
+        print(f'target = {self.target_pos()}')
+        print(f'rho = {rho}')
+        print(f'alpha = {alpha}')
+        print(f'vL = {vL}')
+        print(f'vR = {vL}')
+
+        # Normalize wheelspeed
+        # (Keep the wheel speeds a bit less than the actual platform MAX_SPEED to minimize jerk)
+        wheels.vL, wheels.vR = vL, vR
 
 gripper_status = "closed"
 
