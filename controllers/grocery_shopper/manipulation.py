@@ -13,8 +13,11 @@ import mapping
 import navigation
 import localization as loc
 import numpy as np
+import task_tree
 
 DEBUG = True
+autonomous = True
+
 
 class WheelMotors:
     def __init__(self):
@@ -60,46 +63,60 @@ class ManualController:
         elif key == ord('L'):
             mapping.mapper.load()
         elif key == ord('A'):
-            global controller
-            controller = IKController(navigation.waypoints)
+            global autonomous
+            autonomous = True
         else:  # slow down
             wheels.vL *= 0.75
             wheels.vR *= 0.75
 
 
+def ease_out_exp(x):
+    return 1 - np.power(2.0, -10 * min(max(x, 0), 1))
+
+
 class IKController:
     """Inverse Kinematics Controller"""
 
-    def __init__(self, waypoints) -> None:
-        self.waypoints = waypoints
-        self.checkpoint = 0
+    def __init__(self):
+        self.target_pos = None
 
     def target_reached(self):
-        return self.checkpoint >= len(self.waypoints)
+        if self.target_pos is None:
+            return False
 
-    def target_pos(self):
-        if self.target_reached():
-            # reached target position
-            return loc.pose_x, loc.pose_y
-        else:
-            return self.waypoints[self.checkpoint]
+        dist = np.linalg.norm([
+            loc.pose_x - self.target_pos[0],
+            loc.pose_y - self.target_pos[1],
+        ])
+
+        return dist < 0.5
+
+    def set_target(self, target_pos):
+        self.target_pos = target_pos
+
+    def get_target(self):
+        if self.target_pos is None:
+            return [0, 0]
+
+        return self.target_pos
 
     def calculate_position_error(self):
-        target_x, target_y = self.target_pos()
+        target_x, target_y = self.get_target()
         return np.sqrt((loc.pose_x - target_x)**2 + (loc.pose_y - target_y)**2)
 
-
     def calculate_bearing_error(self):
-        target_x, target_y = self.target_pos()
+        target_x, target_y = self.get_target()
         dx, dy = target_x - loc.pose_x, target_y - loc.pose_y
         theta = np.arctan2(dy, dx)
-        return theta - loc.pose_theta
+        alpha = theta - loc.pose_theta
+        if alpha > np.pi:
+            # prevent robot from trying to turn 270 deg left instead of right
+            alpha = alpha - 2 * np.pi
+        return alpha
 
     def update(self):
         if self.target_reached():
-            global controller
-            controller = ManualController()
-            return 
+            return
 
         def inverse_kinematics(dx, theta):
             L = dx - theta * robot.AXLE_LENGTH / 2
@@ -109,7 +126,6 @@ class IKController:
         def balance_values(vL, vR):
             '''normalize vL, vR to -1 to 1'''
             max_value = max(abs(vL), abs(vR))
-            max_value = max(max_value, robot.MAX_SPEED)
             vR = vR / max_value
             vL = vL / max_value
             return vL, vR
@@ -124,38 +140,52 @@ class IKController:
             return
 
         # STEP 2: Controller
-        dx = 3 * rho
-        dtheta = 10 * alpha
+        # set min rho to limit influence on IK for large values of rho
+        dx = 1 * max(rho, 3)
+        dtheta = 20 * alpha
 
         # STEP 3: Compute wheelspeeds
         vL, vR = inverse_kinematics(dx, dtheta)
-        vL, vR = balance_values(vL, vR)  # normalize values between -1 to 1
+        # normalize values between -1 to 1
+        vL, vR = balance_values(vL, vR)
 
-        vL = vL * robot.MAX_SPEED  # convert to rotational vel
-        vR = vR * robot.MAX_SPEED  # convert to rotational vel
+        # convert to rotational vel
+        vL = vL * robot.MAX_SPEED * ease_out_exp(rho)
+        # convert to rotational vel
+        vR = vR * robot.MAX_SPEED * ease_out_exp(rho)
 
         if DEBUG:
             print('==== NAVIGATION FRAME ===')
-            print(f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
-            print(f'target = {self.target_pos()}')
+            print(
+                f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
+            print(f'target = {self.get_target()}')
             print(f'rho = {rho}')
             print(f'alpha = {alpha}')
+            print(f'dx = {dx}')
             print(f'vL = {vL}')
-            print(f'vR = {vL}')
+            print(f'vR = {vR}')
 
         # Normalize wheelspeed
         # (Keep the wheel speeds a bit less than the actual platform MAX_SPEED to minimize jerk)
         wheels.vL, wheels.vR = vL, vR
 
+
 gripper_status = "closed"
 
-wheels = WheelMotors()
-grippers = Grippers()
-controller = ManualController()
+wheels = None
+grippers = None
+controller = None
+ik_controller = None
+task_root = task_tree.create_root()
 
 
 def init():
     """Initialize manipulation module"""
+    global wheels, grippers, controller, ik_controller
+    wheels = WheelMotors()
+    grippers = Grippers()
+    controller = ManualController()
+    ik_controller = IKController()
 
     pass
 
@@ -163,8 +193,14 @@ def init():
 def update():
     """Update hook for manipulation module"""
 
+    task_root.tick_once()
+
     global gripper_status
-    controller.update()
+    if autonomous:
+        ik_controller.update()
+    else:
+        controller.update()
+
     wheels.update()
 
     if gripper_status == "open":
