@@ -27,14 +27,15 @@ lidar_offsets = np.linspace(
     +LIDAR_ANGLE_RANGE / 2.0, -LIDAR_ANGLE_RANGE / 2.0, LIDAR_ANGLE_BINS
 )
 # Only keep lidar readings not blocked by robot chassis
-lidar_offsets = lidar_offsets[83 : len(lidar_offsets) - 83]
+lidar_offsets = lidar_offsets[83: len(lidar_offsets) - 83]
 
 
 def get_lidar_readings():
     readings = []
     pose_x, pose_y, pose_theta = loc.pose_x, loc.pose_y, loc.pose_theta
     lidar_sensor_readings = lidar.getRangeImage()
-    lidar_sensor_readings = lidar_sensor_readings[83 : len(lidar_sensor_readings) - 83]
+    lidar_sensor_readings = lidar_sensor_readings[83: len(
+        lidar_sensor_readings) - 83]
 
     for alpha, rho in zip(lidar_offsets, lidar_sensor_readings):
         if rho > LIDAR_SENSOR_MAX_RANGE:
@@ -178,15 +179,17 @@ def init():
     for obj_pos in object_positions_list:
         obj_pos_vector = np.array(obj_pos).astype(np.int32)
         img_markup = cv2.circle(
-            img_markup, (obj_pos_vector[1], obj_pos_vector[0]), 5, (0, 0, 0), 10
+            img_markup, (obj_pos_vector[1],
+                         obj_pos_vector[0]), 5, (0, 0, 0), 10
         )
         print("Object pos: " + str(obj_pos_vector))
 
-    cv2.imshow("orig", img)
-    cv2.imshow("mask", img_mask)
-    cv2.imshow("located", img_markup)
-    cv2.waitKey(-1)
-    cv2.destroyAllWindows()
+    # causes controller to freeze
+    # cv2.imshow("orig", img)
+    # cv2.imshow("mask", img_mask)
+    # cv2.imshow("located", img_markup)
+    # cv2.waitKey(-1)
+    # cv2.destroyAllWindows()
 
 
 def update():
