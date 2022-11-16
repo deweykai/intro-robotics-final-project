@@ -149,15 +149,20 @@ def get_blob_centroids(blobs_list):
     return object_positions_list
 
 
+def detect_objects():
+    objects = camera.getRecognitionObjects()
+    rec = [(o.getPosition(), o.getColors())for o in objects]
+    return rec
+
+
 def init():
-    global img
-    img = []
     """Initialize vision module"""
     add_color_range_to_detect([0, 0, 210], [80, 92, 255])
     add_color_range_to_detect([0, 180, 0], [146, 255, 131])
     add_color_range_to_detect([200, 0, 0], [255, 119, 47])
     add_color_range_to_detect([0, 210, 230], [63, 250, 255])
 
+    img = []
     image = camera.getImageArray()
     if image:
         for y in range(0, camera.getHeight()):
@@ -190,6 +195,8 @@ def init():
     # cv2.imshow("located", img_markup)
     # cv2.waitKey(-1)
     # cv2.destroyAllWindows()
+
+    print(detect_objects())
 
 
 def update():
