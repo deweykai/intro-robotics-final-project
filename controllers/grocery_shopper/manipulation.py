@@ -17,9 +17,12 @@ import task_tree
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+nav_logger = logger.getChild('navigation')
+nav_logger.setLevel(logging.DEBUG)
 
 autonomous = True
+
+POSITION_THRESHOLD = 0.5
 
 
 class WheelMotors:
@@ -81,12 +84,12 @@ class ManualController:
                 autonomous = not autonomous
 
 
-def ease_out_exp(x):
+def ease_out_exp(x: float) -> float:
     x = min(max(x, 0), 1)
     return 1 - np.power(2.0, -10 * x)
 
 
-def ease_out_quad(x):
+def ease_out_quad(x: float) -> float:
     x = min(max(x, 0), 1)
     return 1 - (1 - x) * (1 - x)
 
@@ -99,23 +102,31 @@ class IKController:
 
     def target_reached(self):
         if self.target_pos is None:
-            return False
+            return True
+
+        if len(self.waypoints) == 0:
+            return True
 
         dist = np.linalg.norm([
             loc.pose_x - self.target_pos[0],
             loc.pose_y - self.target_pos[1],
         ])
 
-        return dist < 0.05
+        return dist < POSITION_THRESHOLD
 
-    def set_target(self, target_pos):
+    def set_target(self, target_pos: list[float]):
+        if target_pos is None:
+            self.waypoints = []
+        else:
+            self.waypoints = navigation.plan_path(target_pos)[1:]
         self.target_pos = target_pos
 
-    def get_target(self):
-        if self.target_pos is None:
+    def get_target(self) -> list[float]:
+        if self.waypoints is None or self.target_pos is None:
             return [0, 0]
-
-        return self.target_pos
+        if len(self.waypoints) == 0:
+            return [0, 0]
+        return self.waypoints[0]
 
     def calculate_position_error(self):
         target_x, target_y = self.get_target()
@@ -129,6 +140,10 @@ class IKController:
         if alpha > np.pi:
             # prevent robot from trying to turn 270 deg left instead of right
             alpha = alpha - 2 * np.pi
+        if alpha < -np.pi:
+            # prevent robot from trying to turn 270 deg right instead of left
+            alpha = alpha + 2 * np.pi
+
         return alpha
 
     def update(self):
@@ -150,6 +165,10 @@ class IKController:
         rho = self.calculate_position_error()
         alpha = self.calculate_bearing_error()
 
+        if rho < POSITION_THRESHOLD:
+            self.waypoints = self.waypoints[1:]
+            return
+
         # STEP 2: Controller
         # set min rho to limit influence on IK for large values of rho
         dx = 1 * min(rho, 3)
@@ -162,18 +181,19 @@ class IKController:
 
         # convert to rotational vel
         # use `ease_out_quad` is robot is overshooting target
-        vL = vL * robot.MAX_SPEED * ease_out_exp(rho)
-        vR = vR * robot.MAX_SPEED * ease_out_exp(rho)
+        ease_factor = ease_out_quad(rho)
+        vL = vL * robot.MAX_SPEED * ease_factor
+        vR = vR * robot.MAX_SPEED * ease_factor
 
-        logger.debug('==== NAVIGATION FRAME ===')
-        logger.debug(
+        nav_logger.debug('==== NAVIGATION FRAME ===')
+        nav_logger.debug(
             f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
-        logger.debug(f'target = {self.get_target()}')
-        logger.debug(f'rho = {rho}')
-        logger.debug(f'alpha = {alpha}')
-        logger.debug(f'dx = {dx}')
-        logger.debug(f'vL = {vL}')
-        logger.debug(f'vR = {vR}')
+        nav_logger.debug(f'target = {self.get_target()}')
+        nav_logger.debug(f'rho = {rho}')
+        nav_logger.debug(f'alpha = {alpha}')
+        nav_logger.debug(f'dx = {dx}')
+        nav_logger.debug(f'vL = {vL}')
+        nav_logger.debug(f'vR = {vR}')
 
         # Normalize wheelspeed
         # (Keep the wheel speeds a bit less than the actual platform MAX_SPEED to minimize jerk)

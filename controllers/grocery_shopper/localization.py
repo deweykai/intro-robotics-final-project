@@ -36,6 +36,7 @@ positioning = GPS()
 
 def init():
     """Initialize localization module"""
+    positioning.update()
 
     pass
 

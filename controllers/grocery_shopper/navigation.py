@@ -13,12 +13,15 @@ import mapping
 import localization as loc
 from scipy.signal import convolve2d
 import matplotlib.pyplot as plt
+import logging
+
+logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 CONV_SIZE = 15
-DEBUG = False
 
-# TODO: Implement RRT path finding
-waypoints = []
+# display waypoints on map
+DEBUG = False
 
 
 def a_star(map_data, start, end):
@@ -36,8 +39,8 @@ def a_star(map_data, start, end):
 
     # dijkstra's algorithm find shortest path from start to all nodes
     dist = np.ones(map_data.shape) * np.Infinity
-    print(dist.shape)
-    print(start)
+    logger.debug(f'map shape {dist.shape}')
+    logger.debug(f'start position {start}')
     dist[start[1]][start[0]] = 0
     unvisited = {start: h(start, end)}
     prev = {start: None}  # each node will have prev node to keep track
@@ -80,15 +83,40 @@ def a_star(map_data, start, end):
     return path
 
 
-def plan_path(target_pos):
+def smooth_path(path, cspace):
+    if len(path) < 2:
+        return []
+
+    current = path[0]
+    new_path = [current]
+
+    for next in path[1:-1]:
+        line = np.linspace(current, next, 10)
+        for x, y in line:
+            if cspace[int(y)][int(x)] == 1:
+                new_path.append(next)
+                current = next
+                logger.debug(f'hit at {next}')
+                break
+
+    new_path.append(path[-1])
+    logger.debug(new_path)
+    return new_path
+
+
+def plan_path(target_pos: list[float]):
+    logger.debug(f'world target pos: {target_pos}')
+
     end_p = mapping.coords_world_to_map((target_pos[0], target_pos[1]))
     start_p = mapping.coords_world_to_map((loc.pose_x, loc.pose_y))
+    logger.debug(f'plan path from {start_p} to {end_p}')
 
     adj_map = convolve2d(mapping.map_data, np.ones((CONV_SIZE, CONV_SIZE)), mode='same',
                          boundary='fill', fillvalue=1)
     adj_map = (adj_map > (CONV_SIZE**2) * 0.05) * 1
 
     path = a_star(adj_map, start_p, end_p)
+    path = smooth_path(path, adj_map)
 
     if DEBUG:
         plt.imshow(adj_map)
@@ -99,7 +127,7 @@ def plan_path(target_pos):
         plt.show()
 
     waypoints = [mapping.coords_map_to_world(pos) for pos in path]
-    print('waypoints loaded')
+    logger.info('waypoints calculated')
     return waypoints
 
 
