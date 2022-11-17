@@ -1,3 +1,4 @@
 .DS_Store
 *.wbproj
 __pycache__
+*.log

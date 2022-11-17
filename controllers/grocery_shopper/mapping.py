@@ -22,6 +22,9 @@ import matplotlib.pyplot as plt
 from robot import display, DISPLAY_DIM
 from vision import get_lidar_readings
 import localization as loc
+import logging
+
+logger = logging.getLogger(__name__)
 
 WORLD_MIN_X = -15
 WORLD_MAX_X = 15
@@ -63,7 +66,7 @@ class ManualMapper:
         try:
             readings = [coords_world_to_map(pos) for pos in readings]
         except Exception as e:
-            print(e)
+            logger.error(e)
 
         for x, y in readings:
             # gray scale lidar readings
@@ -84,7 +87,7 @@ class ManualMapper:
             # display is adjusted so the orientation matches viewport window
             display.drawPixel(DISPLAY_DIM - robot_y, DISPLAY_DIM - robot_x)
         except Exception as e:
-            print(e)
+            logger.error(e)
 
     def update_map_data(self):
         """Process raw_map then save to map_data"""
@@ -98,7 +101,7 @@ class ManualMapper:
     def load(self):
         """Load raw map data from `raw_map.npy`"""
 
-        print('Loading map...')
+        logger.info('Loading map...')
         self.raw_map = np.load('raw_map.npy')
         for y in range(DISPLAY_DIM):
             for x in range(DISPLAY_DIM):
@@ -115,7 +118,7 @@ class ManualMapper:
     def save(self):
         """Save internal raw map data to file `raw_map.npy`"""
 
-        print('Saving map...')
+        logger.info('Saving map...')
         np.save('raw_map.npy', self.raw_map)
 
 

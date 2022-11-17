@@ -14,8 +14,11 @@ import navigation
 import localization as loc
 import numpy as np
 import task_tree
+import logging
 
-NAV_DEBUG = False
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 autonomous = True
 
 
@@ -40,7 +43,7 @@ class ManualController:
 
     def __init__(self) -> None:
         self.auto_cooldown = 0
-        print('Starting manual controls')
+        logger.info('Starting manual controls')
 
     def update(self):
         self.auto_cooldown = max(self.auto_cooldown - 1, 0)
@@ -162,16 +165,15 @@ class IKController:
         vL = vL * robot.MAX_SPEED * ease_out_exp(rho)
         vR = vR * robot.MAX_SPEED * ease_out_exp(rho)
 
-        if NAV_DEBUG:
-            print('==== NAVIGATION FRAME ===')
-            print(
-                f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
-            print(f'target = {self.get_target()}')
-            print(f'rho = {rho}')
-            print(f'alpha = {alpha}')
-            print(f'dx = {dx}')
-            print(f'vL = {vL}')
-            print(f'vR = {vR}')
+        logger.debug('==== NAVIGATION FRAME ===')
+        logger.debug(
+            f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
+        logger.debug(f'target = {self.get_target()}')
+        logger.debug(f'rho = {rho}')
+        logger.debug(f'alpha = {alpha}')
+        logger.debug(f'dx = {dx}')
+        logger.debug(f'vL = {vL}')
+        logger.debug(f'vR = {vR}')
 
         # Normalize wheelspeed
         # (Keep the wheel speeds a bit less than the actual platform MAX_SPEED to minimize jerk)

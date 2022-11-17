@@ -3,6 +3,10 @@ from py_trees.common import Status
 import localization as loc
 import numpy as np
 import manipulation
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 class DriveTo(pyt.behaviour.Behaviour):
@@ -12,9 +16,10 @@ class DriveTo(pyt.behaviour.Behaviour):
 
     def initialise(self):
         self.target_pos = self.get_position()
-        print(f'Set Target to {self.target_pos}')
+        logger.info(f'Set Target to {self.target_pos}')
 
     def update(self):
+        logger.debug('hello')
         dist = np.linalg.norm([
             loc.pose_x - self.target_pos[0],
             loc.pose_y - self.target_pos[1],
