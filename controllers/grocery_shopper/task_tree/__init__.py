@@ -26,6 +26,10 @@ def create_root():
         DriveTo(get_position=lambda: [13.1, 5.65]),
         DriveTo(get_position=lambda: [13, -5.6]),
         DriveTo(get_position=lambda: [-5.15, -5.65]),
+        DriveTo(get_position=lambda: [-4.8, -1.9]),
+        DriveTo(get_position=lambda: [13, -1.9]),
+        DriveTo(get_position=lambda: [13, 2]),
+        DriveTo(get_position=lambda: [-5, 2]),
     ])
 
     retrieve_object_tree = Sequence(children=[

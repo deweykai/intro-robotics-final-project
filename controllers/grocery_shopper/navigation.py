@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 CONV_SIZE = 20
 
 # display waypoints on map
-DEBUG = True
+DEBUG = False
 
 
 def a_star(map_data, start, end):
@@ -113,11 +113,7 @@ def plan_path(target_pos: list[float]):
 
     adj_map = convolve2d(mapping.map_data, np.ones((CONV_SIZE, CONV_SIZE)), mode='same',
                          boundary='fill', fillvalue=1)
-    adj_map = (adj_map > (CONV_SIZE**2 * 0.05)) * 1
-    plt.imshow(mapping.map_data)
-    plt.show()
-    plt.imshow(adj_map)
-    plt.show()
+    adj_map = (adj_map > (CONV_SIZE**2 * 0.01)) * 1
 
     path = a_star(adj_map, start_p, end_p)
     path = smooth_path(path, adj_map)
@@ -130,8 +126,9 @@ def plan_path(target_pos: list[float]):
         plt.scatter(x, y)
         plt.show()
 
-    waypoints = [mapping.coords_map_to_world(pos) for pos in path]
-    logger.info('waypoints calculated')
+    # ignore the starting waypoint
+    waypoints = [mapping.coords_map_to_world(pos) for pos in path][1:]
+    logger.info(f'{len(waypoints)} waypoints calculated')
     return waypoints
 
 

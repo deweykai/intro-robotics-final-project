@@ -5,7 +5,7 @@ import logging
 
 object_location = [0, 0]
 # debug only
-found_once = False
+found_once = True
 
 
 class FindObject(pyt.behaviour.Behaviour):

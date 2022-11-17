@@ -62,6 +62,16 @@ class ManualMapper:
 
     def update(self):
         """Update internal raw map data"""
+        try:
+            robot_x, robot_y = coords_world_to_map((loc.pose_x, loc.pose_y))
+            # Draw the robot's current pose on the 360x360 display
+            display.setColor(int(0xFF0000))
+            # display is adjusted so the orientation matches viewport window
+            display.drawPixel(DISPLAY_DIM - robot_y, DISPLAY_DIM - robot_x)
+        except Exception as e:
+            logger.error(e)
+
+
         readings = get_lidar_readings()
         try:
             readings = [coords_world_to_map(pos) for pos in readings]
@@ -80,14 +90,6 @@ class ManualMapper:
             # display is adjusted so the orientation matches viewport window
             display.drawPixel(DISPLAY_DIM - y, DISPLAY_DIM - x)
 
-        try:
-            robot_x, robot_y = coords_world_to_map((loc.pose_x, loc.pose_y))
-            # Draw the robot's current pose on the 360x360 display
-            display.setColor(int(0xFF0000))
-            # display is adjusted so the orientation matches viewport window
-            display.drawPixel(DISPLAY_DIM - robot_y, DISPLAY_DIM - robot_x)
-        except Exception as e:
-            logger.error(e)
 
     def update_map_data(self):
         """Process raw_map then save to map_data"""

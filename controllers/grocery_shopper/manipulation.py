@@ -20,9 +20,9 @@ logger = logging.getLogger(__name__)
 nav_logger = logger.getChild('navigation')
 nav_logger.setLevel(logging.DEBUG)
 
-autonomous = True
+autonomous = False
 
-POSITION_THRESHOLD = 0.5
+POSITION_THRESHOLD = 0.1
 
 
 class WheelMotors:
@@ -82,6 +82,15 @@ class ManualController:
             else:
                 self.auto_cooldown = 100
                 autonomous = not autonomous
+        elif key == ord('1'):
+            upper_height()
+        elif key == ord('2'):
+            lower_height()
+        elif key == ord('3'):
+            above_basket()
+        elif key == ord('R'):
+            global gripper_status
+            gripper_status = 'closed'
 
 
 def ease_out_exp(x: float) -> float:
@@ -118,7 +127,8 @@ class IKController:
         if target_pos is None:
             self.waypoints = []
         else:
-            self.waypoints = navigation.plan_path(target_pos)[1:]
+            logger.warning('pathfinding disabled')
+            self.waypoints = [target_pos]  # navigation.plan_path(target_pos)
         self.target_pos = target_pos
 
     def get_target(self) -> list[float]:
@@ -171,7 +181,7 @@ class IKController:
 
         # STEP 2: Controller
         # set min rho to limit influence on IK for large values of rho
-        dx = 1 * min(rho, 3)
+        dx = 1 * min(rho, 2)
         dtheta = 10 * alpha
 
         # STEP 3: Compute wheelspeeds
@@ -209,6 +219,41 @@ ik_controller = None
 task_root = task_tree.create_root()
 
 
+def upper_height():
+    # object is always on shelf 2 or 3
+    robot.robot_parts['arm_1_joint'].setPosition(np.pi / 2)
+    robot.robot_parts['arm_2_joint'].setPosition(1)  # -1.5 - 1.02
+    robot.robot_parts['arm_3_joint'].setPosition(0)  # 1.5
+    robot.robot_parts['arm_4_joint'].setPosition(1)
+    robot.robot_parts['arm_5_joint'].setPosition(0)
+    robot.robot_parts['arm_6_joint'].setPosition(0)
+    robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
+    robot.robot_parts['torso_lift_joint'].setPosition(0.16)  # range 0 - 0.35
+
+
+def lower_height():
+    # object is always on shelf 2 or 3
+    robot.robot_parts['arm_1_joint'].setPosition(np.pi / 2)
+    robot.robot_parts['arm_2_joint'].setPosition(-0.7)  # -1.5 - 1.02
+    robot.robot_parts['arm_3_joint'].setPosition(-np.pi / 2)  # 1.5
+    robot.robot_parts['arm_4_joint'].setPosition(0)
+    robot.robot_parts['arm_5_joint'].setPosition(0)
+    robot.robot_parts['arm_6_joint'].setPosition(0.7)
+    robot.robot_parts['arm_7_joint'].setPosition(0)
+    robot.robot_parts['torso_lift_joint'].setPosition(0.35)  # range 0 - 0.35
+
+
+def above_basket():
+    robot.robot_parts['arm_1_joint'].setPosition(0.8)
+    robot.robot_parts['arm_2_joint'].setPosition(-0.3)  # -1.5 - 1.02
+    robot.robot_parts['arm_3_joint'].setPosition(-np.pi / 2)  # 1.5
+    robot.robot_parts['arm_4_joint'].setPosition(2)
+    robot.robot_parts['arm_5_joint'].setPosition(-2)
+    robot.robot_parts['arm_6_joint'].setPosition(1.39)
+    robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
+    robot.robot_parts['torso_lift_joint'].setPosition(0)  # range 0 - 0.35
+
+
 def init():
     """Initialize manipulation module"""
     global wheels, grippers, keyboard_controller, ik_controller
@@ -217,7 +262,7 @@ def init():
     keyboard_controller = ManualController()
     ik_controller = IKController()
 
-    pass
+    above_basket()
 
 
 def update():
