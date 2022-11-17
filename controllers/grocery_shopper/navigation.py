@@ -80,35 +80,36 @@ def a_star(map_data, start, end):
     return path
 
 
+def plan_path(target_pos):
+    end_p = mapping.coords_world_to_map((target_pos[0], target_pos[1]))
+    start_p = mapping.coords_world_to_map((loc.pose_x, loc.pose_y))
+
+    adj_map = convolve2d(mapping.map_data, np.ones((CONV_SIZE, CONV_SIZE)), mode='same',
+                         boundary='fill', fillvalue=1)
+    adj_map = (adj_map > (CONV_SIZE**2) * 0.05) * 1
+
+    path = a_star(adj_map, start_p, end_p)
+
+    if DEBUG:
+        plt.imshow(adj_map)
+        plt.gca().invert_yaxis()
+        x = np.array([a[0] for a in path])
+        y = np.array([a[1] for a in path])
+        plt.scatter(x, y)
+        plt.show()
+
+    waypoints = [mapping.coords_map_to_world(pos) for pos in path]
+    print('waypoints loaded')
+    return waypoints
+
+
 def init():
     """Initialize navigation module"""
 
-    mapping.mapper.load()
+    pass
 
 
 def update():
     """Update hook for navigation module"""
 
-    global waypoints
-
-    if mapping.dirty:
-        mapping.dirty = False
-        end_p = mapping.coords_world_to_map((13, 1.3))
-        start_p = mapping.coords_world_to_map((loc.pose_x, loc.pose_y))
-
-        adj_map = convolve2d(mapping.map_data, np.ones((CONV_SIZE, CONV_SIZE)), mode='same',
-                             boundary='fill', fillvalue=1)
-        adj_map = (adj_map > (CONV_SIZE**2) * 0.05) * 1
-
-        path = a_star(adj_map, start_p, end_p)
-
-        if DEBUG:
-            plt.imshow(adj_map)
-            plt.gca().invert_yaxis()
-            x = np.array([a[0] for a in path])
-            y = np.array([a[1] for a in path])
-            plt.scatter(x, y)
-            plt.show()
-
-        waypoints = [mapping.coords_map_to_world(pos) for pos in path]
-        print('waypoints loaded')
+    pass

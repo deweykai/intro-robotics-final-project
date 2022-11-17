@@ -6,11 +6,12 @@ import manipulation
 
 
 class DriveTo(pyt.behaviour.Behaviour):
-    def __init__(self, target_pos='', name='Drive To'):
+    def __init__(self, get_position, name='Drive To'):
         super().__init__(name)
-        self.target_pos = target_pos
+        self.get_position = get_position
 
     def initialise(self):
+        self.target_pos = self.get_position()
         print(f'Set Target to {self.target_pos}')
 
     def update(self):

@@ -15,7 +15,7 @@ import localization as loc
 import numpy as np
 import task_tree
 
-DEBUG = True
+NAV_DEBUG = False
 autonomous = True
 
 
@@ -39,39 +39,53 @@ class ManualController:
     """Keyboard control robot controller"""
 
     def __init__(self) -> None:
+        self.auto_cooldown = 0
         print('Starting manual controls')
 
     def update(self):
+        self.auto_cooldown = max(self.auto_cooldown - 1, 0)
+        global autonomous
         key = keyboard.getKey()
-        if key == keyboard.LEFT:
-            wheels.vL = -robot.MAX_SPEED
-            wheels.vR = robot.MAX_SPEED
-        elif key == keyboard.RIGHT:
-            wheels.vL = robot.MAX_SPEED
-            wheels.vR = -robot.MAX_SPEED
-        elif key == keyboard.UP:
-            wheels.vL = robot.MAX_SPEED
-            wheels.vR = robot.MAX_SPEED
-        elif key == keyboard.DOWN:
-            wheels.vL = -robot.MAX_SPEED
-            wheels.vR = -robot.MAX_SPEED
-        elif key == ord(' '):
-            wheels.vL = 0
-            wheels.vR = 0
-        elif key == ord('S'):
+        if not autonomous:
+            if key == keyboard.LEFT:
+                wheels.vL = -robot.MAX_SPEED
+                wheels.vR = robot.MAX_SPEED
+            elif key == keyboard.RIGHT:
+                wheels.vL = robot.MAX_SPEED
+                wheels.vR = -robot.MAX_SPEED
+            elif key == keyboard.UP:
+                wheels.vL = robot.MAX_SPEED
+                wheels.vR = robot.MAX_SPEED
+            elif key == keyboard.DOWN:
+                wheels.vL = -robot.MAX_SPEED
+                wheels.vR = -robot.MAX_SPEED
+            elif key == ord(' '):
+                wheels.vL = 0
+                wheels.vR = 0
+            else:  # slow down
+                wheels.vL *= 0.75
+                wheels.vR *= 0.75
+
+        if key == ord('S'):
             mapping.mapper.save()
         elif key == ord('L'):
             mapping.mapper.load()
         elif key == ord('A'):
-            global autonomous
-            autonomous = True
-        else:  # slow down
-            wheels.vL *= 0.75
-            wheels.vR *= 0.75
+            if self.auto_cooldown > 0:
+                print('autonomous switching cooldown not finished')
+            else:
+                self.auto_cooldown = 100
+                autonomous = not autonomous
 
 
 def ease_out_exp(x):
-    return 1 - np.power(2.0, -10 * min(max(x, 0), 1))
+    x = min(max(x, 0), 1)
+    return 1 - np.power(2.0, -10 * x)
+
+
+def ease_out_quad(x):
+    x = min(max(x, 0), 1)
+    return 1 - (1 - x) * (1 - x)
 
 
 class IKController:
@@ -89,7 +103,7 @@ class IKController:
             loc.pose_y - self.target_pos[1],
         ])
 
-        return dist < 0.5
+        return dist < 0.05
 
     def set_target(self, target_pos):
         self.target_pos = target_pos
@@ -133,16 +147,10 @@ class IKController:
         rho = self.calculate_position_error()
         alpha = self.calculate_bearing_error()
 
-        # check if it has hit the waypoint
-        if rho < 0.5:
-            print(f'hit waypoint {self.checkpoint}')
-            self.checkpoint += 10
-            return
-
         # STEP 2: Controller
         # set min rho to limit influence on IK for large values of rho
-        dx = 1 * max(rho, 3)
-        dtheta = 20 * alpha
+        dx = 1 * min(rho, 3)
+        dtheta = 10 * alpha
 
         # STEP 3: Compute wheelspeeds
         vL, vR = inverse_kinematics(dx, dtheta)
@@ -150,11 +158,11 @@ class IKController:
         vL, vR = balance_values(vL, vR)
 
         # convert to rotational vel
+        # use `ease_out_quad` is robot is overshooting target
         vL = vL * robot.MAX_SPEED * ease_out_exp(rho)
-        # convert to rotational vel
         vR = vR * robot.MAX_SPEED * ease_out_exp(rho)
 
-        if DEBUG:
+        if NAV_DEBUG:
             print('==== NAVIGATION FRAME ===')
             print(
                 f'[pose_x = {loc.pose_x:.3}, pose_y = {loc.pose_y:.3}, pose_theta = {loc.pose_theta:.3}]')
@@ -174,17 +182,17 @@ gripper_status = "closed"
 
 wheels = None
 grippers = None
-controller = None
+keyboard_controller = None
 ik_controller = None
 task_root = task_tree.create_root()
 
 
 def init():
     """Initialize manipulation module"""
-    global wheels, grippers, controller, ik_controller
+    global wheels, grippers, keyboard_controller, ik_controller
     wheels = WheelMotors()
     grippers = Grippers()
-    controller = ManualController()
+    keyboard_controller = ManualController()
     ik_controller = IKController()
 
     pass
@@ -195,11 +203,11 @@ def update():
 
     task_root.tick_once()
 
+    keyboard_controller.update()
+
     global gripper_status
     if autonomous:
         ik_controller.update()
-    else:
-        controller.update()
 
     wheels.update()
 

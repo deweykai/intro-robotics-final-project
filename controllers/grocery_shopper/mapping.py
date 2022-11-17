@@ -45,11 +45,13 @@ def coords_world_to_map(pos):
         raise Exception('y out of bounds')
     return new_x, new_y
 
+
 def coords_map_to_world(map_pos):
     x, y = map_pos
     new_x = ((x / DISPLAY_DIM) - 0.5) * (WORLD_MAX_X - WORLD_MIN_X)
     new_y = ((y / DISPLAY_DIM) - 0.5) * (WORLD_MAX_X - WORLD_MIN_X)
     return new_x, new_y
+
 
 class ManualMapper:
     def __init__(self):
@@ -123,7 +125,7 @@ mapper = ManualMapper()
 def init():
     """Initialize mapping module"""
 
-    pass
+    mapper.load()
 
 
 def update():
