@@ -40,24 +40,19 @@ console_handler.setLevel(logging.INFO)
 console_handler.setFormatter(ColorFormatter())
 
 file_handler_debug = logging.FileHandler('controller_debug.log', mode='w')
-file_handler_debug.setFormatter(ColorFormatter())
+file_handler_debug.setFormatter(logging.Formatter(
+    "[%(asctime)s] [%(levelname)8s] - %(message)s (%(filename)s:%(lineno)d)"))
 file_handler_debug.setLevel(logging.DEBUG)
 
+
 file_handler_info = logging.FileHandler('controller_info.log', mode='w')
-file_handler_info.setFormatter(ColorFormatter())
+file_handler_info.setFormatter(logging.Formatter(
+    "[%(asctime)s] [%(levelname)8s] - %(message)s (%(filename)s:%(lineno)d)"))
 file_handler_info.setLevel(logging.INFO)
 
 logging.basicConfig(level=logging.INFO, handlers=[
                     console_handler, file_handler_info, file_handler_debug])
 
-
-logger = logging.getLogger('test')
-logger.setLevel(logging.DEBUG)
-logger.debug('hello')
-logger.info('hello')
-logger.warn('hello')
-logger.error('hello')
-logger.critical('hello')
 
 # init modules
 robot.step(timestep) != -1
