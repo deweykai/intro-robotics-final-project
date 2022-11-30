@@ -27,15 +27,14 @@ lidar_offsets = np.linspace(
     +LIDAR_ANGLE_RANGE / 2.0, -LIDAR_ANGLE_RANGE / 2.0, LIDAR_ANGLE_BINS
 )
 # Only keep lidar readings not blocked by robot chassis
-lidar_offsets = lidar_offsets[83: len(lidar_offsets) - 83]
+lidar_offsets = lidar_offsets[83 : len(lidar_offsets) - 83]
 
 
 def get_lidar_readings():
     readings = []
     pose_x, pose_y, pose_theta = loc.pose_x, loc.pose_y, loc.pose_theta
     lidar_sensor_readings = lidar.getRangeImage()
-    lidar_sensor_readings = lidar_sensor_readings[83: len(
-        lidar_sensor_readings) - 83]
+    lidar_sensor_readings = lidar_sensor_readings[83 : len(lidar_sensor_readings) - 83]
 
     for alpha, rho in zip(lidar_offsets, lidar_sensor_readings):
         if rho > LIDAR_SENSOR_MAX_RANGE:
@@ -151,16 +150,23 @@ def get_blob_centroids(blobs_list):
 
 def detect_objects():
     objects = camera.getRecognitionObjects()
-    rec = [(o.getPosition(), o.getColors())for o in objects]
+    rec = [(o.getPosition(), o.getColors()) for o in objects]
     return rec
+
+
+def filter_colors(rec):
+    filtered = []
+    for i in rec:
+        converted = [c * 255 for c in i[1]]
+        if check_if_color_in_range(converted):
+            filtered.append(i[0])
+    return filtered
 
 
 def init():
     """Initialize vision module"""
-    add_color_range_to_detect([0, 0, 210], [80, 92, 255])
-    add_color_range_to_detect([0, 180, 0], [146, 255, 131])
-    add_color_range_to_detect([200, 0, 0], [255, 119, 47])
-    add_color_range_to_detect([0, 210, 230], [63, 250, 255])
+    # [88.844295, 217.80927, 0.0]
+    add_color_range_to_detect([86, 215, 0], [90, 219, 4])
 
     img = []
     image = camera.getImageArray()
@@ -184,8 +190,7 @@ def init():
     for obj_pos in object_positions_list:
         obj_pos_vector = np.array(obj_pos).astype(np.int32)
         img_markup = cv2.circle(
-            img_markup, (obj_pos_vector[1],
-                         obj_pos_vector[0]), 5, (0, 0, 0), 10
+            img_markup, (obj_pos_vector[1], obj_pos_vector[0]), 5, (0, 0, 0), 10
         )
         print("Object pos: " + str(obj_pos_vector))
 
@@ -196,7 +201,8 @@ def init():
     # cv2.waitKey(-1)
     # cv2.destroyAllWindows()
 
-    print(detect_objects())
+    rec = detect_objects()
+    print(filter_colors(rec))
 
 
 def update():
