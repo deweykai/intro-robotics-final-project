@@ -27,12 +27,6 @@ def set_arm_to_target(target):
     )
 
     logger.warning('setting robot positions disabled')
-    # for res in range(len(ikResults)):
-    #     if arm_chain.links[res].name in part_names:
-    #         robot.getDevice(arm_chain.links[res].name).setPosition(
-    #             ikResults[res])
-    #         print("Setting {} to {}".format(
-    #             arm_chain.links[res].name, ikResults[res]))
 
     import ikpy.utils.plot as plot_utils
     import matplotlib.pyplot as plt
