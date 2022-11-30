@@ -20,11 +20,8 @@ part_names = (
 
 for link_id in range(len(arm_chain.links)):
 
-    # This is the actual link object
     link = arm_chain.links[link_id]
 
-    # I've disabled "torso_lift_joint" manually as it can cause
-    # the TIAGO to become unstable.
     if link.name not in part_names or link.name == "torso_lift_joint":
         print("Disabling {}".format(link.name))
         arm_chain.active_links_mask[link_id] = False
@@ -34,8 +31,6 @@ for link in arm_chain.links:
     if link.name in part_names and link.name != "torso_lift_joint":
         motor = robot.getDevice(link.name)
 
-        # Make sure to account for any motors that
-        # require a different maximum velocity!
         if link.name == "torso_lift_joint":
             motor.setVelocity(0.07)
         else:
@@ -46,6 +41,7 @@ for link in arm_chain.links:
         motors.append(motor)
 
 prev_target = None
+
 # get from vision.py
 target = None
 
