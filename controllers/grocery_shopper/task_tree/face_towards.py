@@ -26,6 +26,8 @@ class FaceTowards(pyt.behaviour.Behaviour):
         logger.debug(f'Bearing Error: {bearing_error}')
 
         if np.abs(bearing_error) < 0.01:
+            manipulation.wheels.vL = 0
+            manipulation.wheels.vR = 0
             return Status.SUCCESS
 
         speed = manipulation.ease_out_quad(np.abs(bearing_error)) * 5

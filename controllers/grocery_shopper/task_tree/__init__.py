@@ -54,6 +54,4 @@ def create_root():
         wander_tree
     ])
 
-    root = FaceTowards(lambda: [-12, -6])
-
     return root
