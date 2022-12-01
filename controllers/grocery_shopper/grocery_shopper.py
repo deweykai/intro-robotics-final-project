@@ -61,6 +61,7 @@ vision.init()
 mapping.init()
 navigation.init()
 manipulation.init()
+print(timestep)
 
 # Main Loop
 while robot.step(timestep) != -1:

@@ -18,7 +18,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 nav_logger = logger.getChild('navigation')
-nav_logger.setLevel(logging.DEBUG)
+# nav_logger.setLevel(logging.DEBUG)
 
 autonomous = False
 
@@ -127,8 +127,9 @@ class IKController:
         if target_pos is None:
             self.waypoints = []
         else:
-            logger.warning('pathfinding disabled')
-            self.waypoints = [target_pos]  # navigation.plan_path(target_pos)
+            # logger.warning('pathfinding disabled')
+            # self.waypoints = [target_pos]  # navigation.plan_path(target_pos)
+            self.waypoints = navigation.plan_path(target_pos)
         self.target_pos = target_pos
 
     def get_target(self) -> list[float]:
@@ -268,12 +269,11 @@ def init():
 def update():
     """Update hook for manipulation module"""
 
-    task_root.tick_once()
-
     keyboard_controller.update()
 
     global gripper_status
     if autonomous:
+        task_root.tick_once()
         ik_controller.update()
 
     wheels.update()

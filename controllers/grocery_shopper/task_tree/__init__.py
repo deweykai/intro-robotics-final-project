@@ -1,8 +1,12 @@
 from .drive_to import DriveTo
+from .wait import Timer
 from . import find_object
 from py_trees.composites import *
+from .face_towards import FaceTowards
 import py_trees as pyt
 import localization as loc
+
+AILE_WIDTH = 4
 
 
 def in_front_of_object():
@@ -12,9 +16,9 @@ def in_front_of_object():
     # the object is shelf, the shelf can be left or right of the object, we want to be in front.
     # assume we cannot see an object from behind the shelf
     if object_pos[1] > loc.pose_y:
-        target_y = object_pos[1] - 1
+        target_y = object_pos[1] - AILE_WIDTH / 2
     if object_pos[1] < loc.pose_y:
-        target_y = object_pos[1] + 1
+        target_y = object_pos[1] + AILE_WIDTH / 2
 
     target_x = object_pos[0]
     return [target_x, target_y]
@@ -36,10 +40,12 @@ def create_root():
         find_object.FindObject(),
         # object_visible,
         Parallel(children=[
-            DriveTo(get_position=in_front_of_object)
+            DriveTo(get_position=in_front_of_object),
             # drive_infront_of_object
             # position_arm
         ]),
+        FaceTowards(get_target=lambda: find_object.object_location),
+        Timer(ms=5000),
         # grab object
     ])
 
@@ -47,5 +53,7 @@ def create_root():
         retrieve_object_tree,
         wander_tree
     ])
+
+    root = FaceTowards(lambda: [-12, -6])
 
     return root

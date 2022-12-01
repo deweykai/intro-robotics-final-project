@@ -1,18 +1,21 @@
 import py_trees as pyt
 from py_trees.common import Status
+from robot import timestep
 
 
 class Timer(pyt.behaviour.Behaviour):
-    def __init__(self, ticks=100, name='Timer'):
+    def __init__(self, ms=100, name='Timer'):
         super().__init__(name)
-        self.wait_ticks = ticks
+        self.passed = 0
+        self.ms = ms
 
     def initialise(self):
-        self.tick = 0
+        self.passed = 0
         return super().initialise()
 
     def update(self):
-        if self.tick < self.wait_ticks:
+        self.passed += timestep
+        if self.passed < self.ms:
             return Status.RUNNING
         else:
             return Status.SUCCESS
