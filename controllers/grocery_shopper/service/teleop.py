@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 auto_cooldown = 0
-autonomous = False
+autonomous = True
 grip_open = False
 precision_mode = False
 

@@ -3,8 +3,10 @@ from py_trees.common import Status
 import logging
 import numpy as np
 import bus
+from utils.object_to_world import object_to_world
 
 logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
 
 object_location = [0, 0]
 
@@ -25,22 +27,33 @@ def camera_data(objects):
     global detected_objects
     detected_objects = objects
 
+    for obj in objects:
+        world_pos = object_to_world(
+            [pose_x, pose_y, pose_theta], obj.position)
+
+        logger.debug(world_pos)
+
 
 class FindObject(pyt.behaviour.Behaviour):
+    def __init__(self, limit_range=True):
+        super().__init__()
+        self.limit_range = limit_range
+
     def update(self):
         global object_location
 
-        positions = [o[0] for o in detected_objects]
-        for pos in positions:
-            dx = pos[0]
-            dy = pos[1]
+        for obj in detected_objects:
+            dist = np.linalg.norm(obj.position)
+            if not self.limit_range or (dist > 5 and dist < 10):
+                world_pos = object_to_world(
+                    [pose_x, pose_y, pose_theta], obj.position)
 
-            dist = np.linalg.norm([dx, dy])
-            if dist > 5 and dist < 10:
-                # index 0 is object position
-                object_location = [dx + pose_x, dy + pose_y]
-                logger.info(f'target found at {object_location}')
-                return Status.SUCCESS
+                if world_pos[2] > -0.85:
+                    # ignore objects on floor
+                    object_location = world_pos
+
+                    logger.info(f'target found at {object_location}')
+                    return Status.SUCCESS
 
         # find tree
         return Status.FAILURE

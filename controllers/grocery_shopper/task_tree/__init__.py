@@ -3,6 +3,9 @@ from .wait import Timer
 from . import find_object
 from py_trees.composites import *
 from .face_towards import FaceTowards
+from .arms import SetArms
+from .gripper import SetGripper
+from .fowards import DriveForwards
 import bus
 import numpy as np
 
@@ -10,6 +13,7 @@ AILE_WIDTH = 4
 
 pose_x, pose_y, pose_theta = 0, 0, 0
 autonomous = False
+object_dist = 0
 
 
 @bus.subscribe('/bot/pose', np.ndarray)
@@ -45,16 +49,54 @@ wander_tree = Sequence(children=[
 ])
 
 retrieve_object_tree = Sequence(children=[
-    find_object.FindObject(),
     # object_visible,
-    Parallel(children=[
-        DriveTo(get_position=in_front_of_object),
-        # drive_infront_of_object
-        # position_arm
-    ]),
+    find_object.FindObject(),
+    # drive to object
+    DriveTo(get_position=in_front_of_object),
+    # face towards target
     FaceTowards(get_target=lambda: find_object.object_location),
-    Timer(ms=5000),
+
+    # check object position again
+    find_object.FindObject(limit_range=False),
+    FaceTowards(get_target=lambda: find_object.object_location),
+
+    # ready arm and gripper to grab target
+    SetArms(get_target=lambda: find_object.object_location),
+    SetGripper(open_state=True),
+    Timer(ms=10_000),
+
+    # try to fix alignment
+    DriveForwards(speed=1.0),
+    Timer(ms=1_000),
+    FaceTowards(get_target=lambda: find_object.object_location),
+    Timer(ms=1_000),
+
+    # drive into object, make sure to face object
+    DriveForwards(speed=1.0, cond=lambda: object_dist < 1.3),
+    FaceTowards(get_target=lambda: find_object.object_location),
+
+    DriveForwards(speed=1.0, cond=lambda: object_dist < 1.1),
+    FaceTowards(get_target=lambda: find_object.object_location),
+
+    DriveForwards(speed=1.0, cond=lambda: object_dist < 0.9),
+    FaceTowards(get_target=lambda: find_object.object_location),
+
+    DriveForwards(speed=1.0, cond=lambda: object_dist < 0.8),
+
     # grab object
+    DriveForwards(speed=0.0),
+    SetGripper(open_state=False),
+    Timer(ms=1_000),
+
+    # back away from shelf
+    DriveForwards(speed=-1.0),
+    Timer(ms=10_000),
+
+    # put object in basket
+    SetArms(state='basket'),
+    DriveForwards(speed=0.0),
+    Timer(ms=5_000),
+    SetGripper(open_state=True),
 ])
 
 root = Selector(children=[
@@ -67,8 +109,12 @@ root.setup()
 
 @bus.subscribe('/bot/cmd_tick', int)
 def tick_root(_):
+    global object_dist
     if autonomous:
         root.tick_once()
+        dx = find_object.object_location[0] - pose_x
+        dy = find_object.object_location[1] - pose_y
+        object_dist = np.linalg.norm([dx, dy])
 
 
 @bus.subscribe('/bot/cmd_auto', bool)

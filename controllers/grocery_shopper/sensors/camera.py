@@ -2,6 +2,7 @@ from robot import camera
 import bus
 import logging
 import numpy as np
+from typing import Sequence
 
 logger = logging.getLogger(__name__)
 
@@ -31,24 +32,44 @@ def check_if_color_in_range(bgr_tuple):
     return False
 
 
-def detect_objects():
+class RecognitionObject:
+    def __init__(self, position, orientation, color):
+        self.position = position
+        self.orientation = orientation
+        self.color = color[:3]
+
+    def __repr__(self):
+        return f'({self.position}), ({self.orientation}), ({self.color})'
+
+
+def detect_objects() -> Sequence[RecognitionObject]:
     objects = camera.getRecognitionObjects()
-    rec = [(o.getPosition(), o.getColors()) for o in objects]
+    rec = [RecognitionObject(
+        o.getPosition(), o.getOrientation(), o.getColors()) for o in objects]
     return rec
 
 
-def filter_colors(objects):
-    filtered = list(filter(lambda c: check_if_color_in_range(c[1]), objects))
+def filter_colors(objects: Sequence[RecognitionObject]) -> Sequence[RecognitionObject]:
+    filtered = list(
+        filter(lambda c: check_if_color_in_range(c.color), objects))
     return filtered
 
 
-def detect_filtered_objects():
+def detect_filtered_objects() -> Sequence[RecognitionObject]:
     return filter_colors(detect_objects())
 
+
 pub_detected_objects = bus.Publisher('/bot/sensor/camera_rec', list)
+
+
+add_color_range_to_detect(lower_bound=np.array(
+    [0.9, 0.9, 0.0]), upper_bound=np.array([1.0, 1.0, 0.0]))
 
 
 @bus.subscribe('/bot/cmd_tick', int)
 def update_camera(_):
     filtered_objects = detect_filtered_objects()
     pub_detected_objects.publish(filtered_objects)
+
+
+#bus.inspect('/bot/sensor/camera_rec', list)

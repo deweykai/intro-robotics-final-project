@@ -7,6 +7,7 @@ import bus
 from robot import *
 import sensors.gps as _
 import sensors.lidar as _
+import sensors.camera as _
 import motors.wheel as _
 import motors.arm as _
 import motors.gripper as _

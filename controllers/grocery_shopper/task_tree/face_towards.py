@@ -6,7 +6,7 @@ import logging
 import bus
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 pose_x, pose_y, pose_theta = 0, 0, 0
 
@@ -37,7 +37,7 @@ class FaceTowards(pyt.behaviour.Behaviour):
         logger.debug(f'Relative Bearing: {relative_bearing}')
         logger.debug(f'Bearing Error: {bearing_error}')
 
-        if np.abs(bearing_error) < 0.01:
+        if np.abs(bearing_error) < 0.005:
             left_wheel_pub.publish(0.0)
             right_wheel_pub.publish(0.0)
             return Status.SUCCESS
