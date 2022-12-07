@@ -2,6 +2,8 @@ from .drive_to import DriveTo
 from .wait import Timer
 from . import find_object
 from py_trees.composites import *
+import py_trees as pyt
+from py_trees.common import Status
 from .face_towards import FaceTowards
 from .arms import SetArms
 from .gripper import SetGripper
@@ -37,15 +39,28 @@ def in_front_of_object():
     return [target_x, target_y]
 
 
+
+
+wander_positions = [
+    [-5, 5.65],
+    [13.1, 5.65],
+    [13, -5.6],
+    [-5.15, -5.65],
+    [-4.8, -1.9],
+    [13, -1.9],
+    [13, 2],
+    [-5, 2],
+]
+drive_index = 0
+class UpdateWanderPosition(pyt.behaviour.Behaviour):
+    def update(self):
+        global drive_index
+        drive_index = (drive_index + 1) % len(wander_positions)
+        return Status.SUCCESS
+
 wander_tree = Sequence(children=[
-    DriveTo(get_position=lambda: [-5, 5.65]),
-    DriveTo(get_position=lambda: [13.1, 5.65]),
-    DriveTo(get_position=lambda: [13, -5.6]),
-    DriveTo(get_position=lambda: [-5.15, -5.65]),
-    DriveTo(get_position=lambda: [-4.8, -1.9]),
-    DriveTo(get_position=lambda: [13, -1.9]),
-    DriveTo(get_position=lambda: [13, 2]),
-    DriveTo(get_position=lambda: [-5, 2]),
+    DriveTo(get_position=lambda: wander_positions[drive_index]),
+    UpdateWanderPosition(),
 ])
 
 
