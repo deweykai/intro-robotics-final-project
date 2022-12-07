@@ -11,8 +11,8 @@ from robot import *
 import sensors.gps as _
 import sensors.lidar as _
 import motors.wheel as _
-import teleop as _
-import mapping as _
+import service.teleop as _
+import service.mapping as _
 import task_tree as _
 import logging
 import sys

@@ -1,6 +1,8 @@
 from robot import keyboard, MAX_SPEED
 import bus
+import logging
 
+logger = logging.getLogger(__name__)
 auto_cooldown = 0
 autonomous = False
 
@@ -47,10 +49,11 @@ def update(_):
         # mapping.mapper.load()
     elif key == ord('A'):
         if auto_cooldown > 0:
-            print('autonomous switching cooldown not finished')
+            logger.debug('autonomous switching cooldown not finished')
         else:
             auto_cooldown = 100
             autonomous = not autonomous
+            logger.info(f'auto state set to {autonomous}')
             autonomous_pub.publish(autonomous)
 
     elif key == ord('1'):

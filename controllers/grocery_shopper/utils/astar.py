@@ -9,8 +9,7 @@ This module depends:
     * mapping - map data to plan a path
 """
 import numpy as np
-import mapping
-import localization as loc
+from service import mapping
 from scipy.signal import convolve2d
 import matplotlib.pyplot as plt
 import logging
@@ -104,11 +103,11 @@ def smooth_path(path, cspace):
     return new_path
 
 
-def plan_path(target_pos: list[float]):
+def plan_path(start_pos, target_pos: list[float]):
     logger.debug(f'world target pos: {target_pos}')
 
     end_p = mapping.coords_world_to_map((target_pos[0], target_pos[1]))
-    start_p = mapping.coords_world_to_map((loc.pose_x, loc.pose_y))
+    start_p = mapping.coords_world_to_map((start_pos[0], start_pos[1]))
     logger.debug(f'plan path from {start_p} to {end_p}')
 
     adj_map = convolve2d(mapping.map_data, np.ones((CONV_SIZE, CONV_SIZE)), mode='same',
