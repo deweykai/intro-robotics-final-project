@@ -5,11 +5,16 @@ import logging
 logger = logging.getLogger(__name__)
 auto_cooldown = 0
 autonomous = True
+grip_open = False
 
 left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)
 right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)
 autonomous_pub = bus.Publisher('/bot/cmd_auto', bool)
+gripper_pub = bus.Publisher('/bot/cmd_gripper', bool)
+arm_pub = bus.Publisher('/bot/cmd_arm', str)
 autonomous_pub.publish(autonomous)
+gripper_pub.publish(True)
+arm_pub.publish('basket')
 
 
 @bus.subscribe('/bot/cmd_auto', bool)
@@ -17,6 +22,12 @@ def update_auto_state(new_state):
     global autonomous
     autonomous = new_state
     logger.info(f'auto state set to {autonomous}')
+
+
+@bus.subscribe('/bot/cmd_gripper', bool)
+def update_gripper_state(new_state):
+    global grip_open
+    grip_open = new_state
 
 
 def update(delta):
@@ -63,17 +74,17 @@ def update(delta):
             autonomous_pub.publish(not autonomous)
 
     elif key == ord('1'):
-        pass
-        # upper_height()
+        arm_pub.publish('upper')
     elif key == ord('2'):
-        pass
-        # lower_height()
+        arm_pub.publish('lower')
     elif key == ord('3'):
-        pass
-        # above_basket()
+        arm_pub.publish('basket')
     elif key == ord('R'):
-        global gripper_status
-        gripper_status = 'closed'
+        if auto_cooldown > 0:
+            logger.debug('autonomous switching cooldown not finished')
+        else:
+            auto_cooldown = 100
+            gripper_pub.publish(not grip_open)
 
 
 bus.Subscriber('/bot/cmd_tick', int, update)
