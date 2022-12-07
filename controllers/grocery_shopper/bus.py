@@ -7,17 +7,26 @@ class Topic:
         self.topic_name = topic_name
         self.topic_type = topic_type
         self.observers = []
+        self.queue = []
 
     def __repr__(self):
         return f'Topic({self.topic_name}, {self.topic_type})'
 
     def register_observer(self, callback: Callable[[T], None]):
         self.observers.append(callback)
+        for data in self.queue:
+            callback(data)
+
 
     def broadcast(self, data: T):
         if not isinstance(data, self.topic_type):
             raise TypeError(
                 f'{self} passed an invalid type {data}({type(data)})')
+
+        self.queue.append(data)
+        while len(self.queue) > 10:
+            self.queue.pop(0)
+
         for observer in self.observers:
             observer(data)
 
