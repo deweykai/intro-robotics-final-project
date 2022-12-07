@@ -65,7 +65,7 @@ root = Selector(children=[
 root.setup()
 
 
-@bus.subscribe('/bot/cmd_tick', int)
+# @bus.subscribe('/bot/cmd_tick', int)
 def tick_root(_):
     if autonomous:
         root.tick_once()
