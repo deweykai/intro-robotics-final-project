@@ -47,10 +47,6 @@ class FindObject(pyt.behaviour.Behaviour):
             world_pos = object_to_world(
                 [pose_x, pose_y, pose_theta], obj.position)
 
-            print('== DATA ==')
-            print(obj.position)
-            print(dist)
-            print(abs(pose_x - world_pos[0]))
             # ignore objects on floor
             if world_pos[2] < -0.85:
                 continue
