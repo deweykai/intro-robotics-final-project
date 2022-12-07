@@ -15,7 +15,7 @@ gripper_pub = bus.Publisher('/bot/cmd_gripper', bool)
 arm_pub = bus.Publisher('/bot/cmd_arm', str)
 autonomous_pub.publish(autonomous)
 gripper_pub.publish(True)
-arm_pub.publish('basket')
+arm_pub.publish('standby')
 
 
 @bus.subscribe('/bot/cmd_auto', bool)

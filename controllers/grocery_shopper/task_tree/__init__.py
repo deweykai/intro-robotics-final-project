@@ -54,16 +54,18 @@ close_range_grab_object = Sequence(name='grab close range', children=[
     find_object.FindObject(close_range=True),
     FaceTowards(get_target=lambda: find_object.object_location),
 
-    # ready arm and gripper to grab target
-    SetArms(get_target=lambda: find_object.object_location),
-    SetGripper(open_state=True),
-    Timer(ms=10_000),
-
     # try to fix alignment
     DriveForwards(speed=1.0),
     Timer(ms=1_000),
     FaceTowards(get_target=lambda: find_object.object_location),
     Timer(ms=1_000),
+
+
+    # ready arm and gripper to grab target
+    SetArms(get_target=lambda: find_object.object_location),
+    SetGripper(open_state=True),
+    Timer(ms=10_000),
+
 
     # drive into object, make sure to face object
     DriveForwards(speed=1.0, cond=lambda: object_dist < 1.3),
@@ -97,6 +99,9 @@ close_range_grab_object = Sequence(name='grab close range', children=[
     SetArms(state='post-basket'),
     Timer(ms=1_000),
     SetGripper(open_state=True),
+    Timer(ms=5_000),
+    SetArms(state='standby'),
+    Timer(ms=5_000),
 ])
 
 long_range_grab_object = Sequence(name='grab long range', children=[

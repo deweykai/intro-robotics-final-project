@@ -47,6 +47,15 @@ def above_basket():
     robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
     robot.robot_parts['torso_lift_joint'].setPosition(0)  # range 0 - 0.35
 
+def standby():
+    robot.robot_parts['arm_1_joint'].setPosition(0.7)
+    robot.robot_parts['arm_2_joint'].setPosition(1.02)  # -1.5 - 1.02
+    robot.robot_parts['arm_3_joint'].setPosition(-3.16)  # 1.5
+    robot.robot_parts['arm_4_joint'].setPosition(1.27)
+    robot.robot_parts['arm_5_joint'].setPosition(1.32)
+    robot.robot_parts['arm_6_joint'].setPosition(0.0)
+    robot.robot_parts['arm_7_joint'].setPosition(1.41)
+
 
 height = 'lower'
 
@@ -71,5 +80,7 @@ def cmd_arm(position):
         robot.robot_parts['arm_7_joint'].setPosition(0)
     elif position == 'post-basket':
         robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
+    elif position == 'standby':
+        standby()
     else:
         logger.error('unknown arm position')
