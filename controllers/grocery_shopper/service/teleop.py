@@ -4,8 +4,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 auto_cooldown = 0
-autonomous = True
+autonomous = False
 grip_open = False
+precision_mode = False
 
 left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)
 right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)
@@ -31,7 +32,7 @@ def update_gripper_state(new_state):
 
 
 def update(delta):
-    global auto_cooldown, autonomous
+    global auto_cooldown, precision_mode
     if auto_cooldown > 0:
         auto_cooldown = max(0, auto_cooldown - delta)
 
@@ -56,6 +57,10 @@ def update(delta):
         else:  # slow down
             vL *= 0.75
             vR *= 0.75
+
+        if precision_mode:
+            vL *= 0.1
+            vR *= 0.1
 
         left_wheel_pub.publish(vL)
         right_wheel_pub.publish(vR)
@@ -85,6 +90,14 @@ def update(delta):
         else:
             auto_cooldown = 100
             gripper_pub.publish(not grip_open)
+
+    elif key == ord('P'):
+        if auto_cooldown > 0:
+            logger.debug('autonomous switching cooldown not finished')
+        else:
+            auto_cooldown = 100
+            precision_mode = not precision_mode
+            logger.info(f'Precission mode set to {precision_mode}')
 
 
 bus.Subscriber('/bot/cmd_tick', int, update)

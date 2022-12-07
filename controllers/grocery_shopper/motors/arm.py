@@ -5,6 +5,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+arm_parts = ["arm_1_joint", "arm_2_joint",  "arm_3_joint",  "arm_4_joint",
+             "arm_5_joint", "arm_6_joint",  "arm_7_joint"]
+
+for part in arm_parts:
+    max_vel = robot.robot_parts[part].getMaxVelocity()
+    robot.robot_parts[part].setVelocity(max_vel / 5.0)
 
 def upper_height():
     # object is always on shelf 2 or 3
