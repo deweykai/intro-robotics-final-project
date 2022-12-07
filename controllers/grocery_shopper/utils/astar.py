@@ -130,15 +130,3 @@ def plan_path(target_pos: list[float]):
     waypoints = [mapping.coords_map_to_world(pos) for pos in path][1:]
     logger.info(f'{len(waypoints)} waypoints calculated')
     return waypoints
-
-
-def init():
-    """Initialize navigation module"""
-
-    pass
-
-
-def update():
-    """Update hook for navigation module"""
-
-    pass

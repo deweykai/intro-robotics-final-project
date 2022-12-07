@@ -2,12 +2,18 @@
 
 # Nov 2, 2022
 
+import bus
 from robot import *
-import mapping
-import localization
-import vision
-import manipulation
-import navigation
+# import mapping
+# import vision
+# import manipulation
+# import navigation
+import sensors.gps as _
+import sensors.lidar as _
+import motors.wheel as _
+import teleop as _
+import mapping as _
+# import task_tree as _
 import logging
 import sys
 
@@ -55,18 +61,21 @@ logging.basicConfig(level=logging.INFO, handlers=[
 
 
 # init modules
-robot.step(timestep) != -1
-localization.init()
-vision.init()
-mapping.init()
-navigation.init()
-manipulation.init()
-print(timestep)
+# robot.step(timestep) != -1
+# localization.init()
+# vision.init()
+# mapping.init()
+# navigation.init()
+# manipulation.init()
+# print(timestep)
 
 # Main Loop
+
+tick_cmd_publisher = bus.Publisher('/bot/cmd_tick', int)
+
 while robot.step(timestep) != -1:
-    localization.update()
-    vision.update()
-    mapping.update()
-    navigation.update()
-    manipulation.update()
+    tick_cmd_publisher.publish(timestep)
+#     vision.update()
+#     mapping.update()
+#     navigation.update()
+#     manipulation.update()

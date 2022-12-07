@@ -17,14 +17,25 @@ This module depends on:
     * localization - to orient robot in map
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from robot import display, DISPLAY_DIM
-from vision import get_lidar_readings
-import localization as loc
 import logging
+import matplotlib.pyplot as plt
+import numpy as np
+import bus
+
+pose_x, pose_y, pose_theta = 0, 0, 0
+
+
+def gps_data(data):
+    global pose_x, pose_y, pose_theta
+    pose_x, pose_y, pose_theta = data
+
+
+bus.Subscriber('/bot/pose', np.ndarray, gps_data)
+
 
 logger = logging.getLogger(__name__)
+
+DISPLAY_DIM = 360
 
 WORLD_MIN_X = -15
 WORLD_MAX_X = 15
@@ -60,19 +71,17 @@ class ManualMapper:
     def __init__(self):
         self.raw_map = np.zeros(map_data.shape)
 
-    def update(self):
+    def update(self, readings):
         """Update internal raw map data"""
+        from robot import display
         try:
-            robot_x, robot_y = coords_world_to_map((loc.pose_x, loc.pose_y))
+            robot_x, robot_y = coords_world_to_map((pose_x, pose_y))
             # Draw the robot's current pose on the 360x360 display
             display.setColor(int(0xFF0000))
             # display is adjusted so the orientation matches viewport window
             display.drawPixel(DISPLAY_DIM - robot_y, DISPLAY_DIM - robot_x)
         except Exception as e:
             logger.error(e)
-
-
-        readings = get_lidar_readings()
         try:
             readings = [coords_world_to_map(pos) for pos in readings]
         except Exception as e:
@@ -90,7 +99,6 @@ class ManualMapper:
             # display is adjusted so the orientation matches viewport window
             display.drawPixel(DISPLAY_DIM - y, DISPLAY_DIM - x)
 
-
     def update_map_data(self):
         """Process raw_map then save to map_data"""
 
@@ -103,6 +111,7 @@ class ManualMapper:
     def load(self):
         """Load raw map data from `raw_map.npy`"""
 
+        from robot import display
         logger.info('Loading map...')
         self.raw_map = np.load('raw_map.npy')
         for y in range(DISPLAY_DIM):
@@ -125,15 +134,11 @@ class ManualMapper:
 
 
 mapper = ManualMapper()
+mapper.load()
 
 
-def init():
-    """Initialize mapping module"""
-
-    mapper.load()
+def update_callback(readings):
+    mapper.update(readings)
 
 
-def update():
-    """Update hook for mapping module"""
-
-    mapper.update()
+bus.Subscriber('/bot/sensor/lidar', list, update_callback)
