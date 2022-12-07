@@ -4,11 +4,19 @@ import logging
 
 logger = logging.getLogger(__name__)
 auto_cooldown = 0
-autonomous = False
+autonomous = True
 
 left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)
 right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)
 autonomous_pub = bus.Publisher('/bot/cmd_auto', bool)
+autonomous_pub.publish(autonomous)
+
+
+@bus.subscribe('/bot/cmd_auto', bool)
+def update_auto_state(new_state):
+    global autonomous
+    autonomous = new_state
+    logger.info(f'auto state set to {autonomous}')
 
 
 def update(delta):
@@ -52,9 +60,7 @@ def update(delta):
             logger.debug('autonomous switching cooldown not finished')
         else:
             auto_cooldown = 100
-            autonomous = not autonomous
-            logger.info(f'auto state set to {autonomous}')
-            autonomous_pub.publish(autonomous)
+            autonomous_pub.publish(not autonomous)
 
     elif key == ord('1'):
         pass

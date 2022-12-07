@@ -1,5 +1,10 @@
 import robot
 import numpy as np
+import bus
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def upper_height():
     # object is always on shelf 2 or 3
@@ -34,3 +39,15 @@ def above_basket():
     robot.robot_parts['arm_6_joint'].setPosition(1.39)
     robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
     robot.robot_parts['torso_lift_joint'].setPosition(0)  # range 0 - 0.35
+
+
+@bus.subscribe('/bot/cmd_arm', str)
+def cmd_arm(position):
+    if position == 'upper':
+        upper_height()
+    elif position == 'lower':
+        lower_height()
+    elif position == 'basket':
+        above_basket()
+    else:
+        logger.error('unknown arm position')

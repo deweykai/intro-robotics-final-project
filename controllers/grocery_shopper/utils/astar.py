@@ -127,5 +127,5 @@ def plan_path(start_pos, target_pos: list[float]):
 
     # ignore the starting waypoint
     waypoints = [mapping.coords_map_to_world(pos) for pos in path][1:]
-    logger.info(f'{len(waypoints)} waypoints calculated')
+    logger.debug(f'{len(waypoints)} waypoints calculated')
     return waypoints
