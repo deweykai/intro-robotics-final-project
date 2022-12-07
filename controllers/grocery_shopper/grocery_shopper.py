@@ -13,7 +13,7 @@ import sensors.lidar as _
 import motors.wheel as _
 import teleop as _
 import mapping as _
-# import task_tree as _
+import task_tree as _
 import logging
 import sys
 

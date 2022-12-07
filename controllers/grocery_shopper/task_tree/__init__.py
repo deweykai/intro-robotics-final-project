@@ -1,9 +1,8 @@
-from .drive_to import DriveTo
+# from .drive_to import DriveTo
 from .wait import Timer
-from . import find_object
+# from . import find_object
 from py_trees.composites import *
 from .face_towards import FaceTowards
-import py_trees as pyt
 import bus
 import numpy as np
 
@@ -34,34 +33,36 @@ def in_front_of_object():
     return [target_x, target_y]
 
 
-wander_tree = Sequence(children=[
-    DriveTo(get_position=lambda: [-5, 5.65]),
-    DriveTo(get_position=lambda: [13.1, 5.65]),
-    DriveTo(get_position=lambda: [13, -5.6]),
-    DriveTo(get_position=lambda: [-5.15, -5.65]),
-    DriveTo(get_position=lambda: [-4.8, -1.9]),
-    DriveTo(get_position=lambda: [13, -1.9]),
-    DriveTo(get_position=lambda: [13, 2]),
-    DriveTo(get_position=lambda: [-5, 2]),
-])
+# wander_tree = Sequence(children=[
+#     DriveTo(get_position=lambda: [-5, 5.65]),
+#     DriveTo(get_position=lambda: [13.1, 5.65]),
+#     DriveTo(get_position=lambda: [13, -5.6]),
+#     DriveTo(get_position=lambda: [-5.15, -5.65]),
+#     DriveTo(get_position=lambda: [-4.8, -1.9]),
+#     DriveTo(get_position=lambda: [13, -1.9]),
+#     DriveTo(get_position=lambda: [13, 2]),
+#     DriveTo(get_position=lambda: [-5, 2]),
+# ])
 
-retrieve_object_tree = Sequence(children=[
-    find_object.FindObject(),
-    # object_visible,
-    Parallel(children=[
-        DriveTo(get_position=in_front_of_object),
-        # drive_infront_of_object
-        # position_arm
-    ]),
-    FaceTowards(get_target=lambda: find_object.object_location),
-    Timer(ms=5000),
-    # grab object
-])
+# retrieve_object_tree = Sequence(children=[
+#     FindObject(),
+#     # object_visible,
+#     Parallel(children=[
+#         DriveTo(get_position=in_front_of_object),
+#         # drive_infront_of_object
+#         # position_arm
+#     ]),
+#     FaceTowards(get_target=lambda: find_object.object_location),
+#     Timer(ms=5000),
+#     # grab object
+# ])
 
-root = Selector(children=[
-    retrieve_object_tree,
-    wander_tree
-])
+# root = Selector(children=[
+#     retrieve_object_tree,
+#     wander_tree
+# ])
+
+root = FaceTowards(get_target=lambda: [-8, -6])
 
 root.setup()
 

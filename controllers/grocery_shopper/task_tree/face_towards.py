@@ -1,12 +1,24 @@
 import py_trees as pyt
 from py_trees.common import Status
-import localization as loc
 import numpy as np
-import manipulation
+from utils.ease_func import ease_out_quad
 import logging
+import bus
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+pose_x, pose_y, pose_theta = 0, 0, 0
+
+
+@bus.subscribe('/bot/pose', np.ndarray)
+def gps_data(data):
+    global pose_x, pose_y, pose_theta
+    pose_x, pose_y, pose_theta = data
+
+
+left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)
+right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)
 
 
 class FaceTowards(pyt.behaviour.Behaviour):
@@ -16,27 +28,27 @@ class FaceTowards(pyt.behaviour.Behaviour):
 
     def update(self):
         target = self.get_target()
-        relative_target = [target[0] - loc.pose_x, target[1] - loc.pose_y]
+        relative_target = [target[0] - pose_x, target[1] - pose_y]
 
         relative_bearing = np.arctan2(relative_target[1], relative_target[0])
-        bearing_error = relative_bearing - loc.pose_theta
+        bearing_error = relative_bearing - pose_theta
 
         logger.debug('=== FACE TOWARDS ===')
         logger.debug(f'Relative Bearing: {relative_bearing}')
         logger.debug(f'Bearing Error: {bearing_error}')
 
         if np.abs(bearing_error) < 0.01:
-            manipulation.wheels.vL = 0
-            manipulation.wheels.vR = 0
+            left_wheel_pub.publish(0.0)
+            right_wheel_pub.publish(0.0)
             return Status.SUCCESS
 
-        speed = manipulation.ease_out_quad(np.abs(bearing_error)) * 5
+        speed = ease_out_quad(np.abs(bearing_error)) * 5.0
 
         if bearing_error > 0:
-            manipulation.wheels.vL = -speed
-            manipulation.wheels.vR = speed
+            left_wheel_pub.publish(-speed)
+            right_wheel_pub.publish(speed)
         else:
-            manipulation.wheels.vL = speed
-            manipulation.wheels.vR = -speed
+            left_wheel_pub.publish(speed)
+            right_wheel_pub.publish(-speed)
 
         return Status.RUNNING
