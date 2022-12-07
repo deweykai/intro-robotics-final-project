@@ -1,6 +1,7 @@
 from robot import camera
 import bus
 import logging
+import numpy as np
 
 logger = logging.getLogger(__name__)
 

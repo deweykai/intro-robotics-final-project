@@ -11,10 +11,10 @@ right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)
 autonomous_pub = bus.Publisher('/bot/cmd_auto', bool)
 
 
-def update(_):
+def update(delta):
     global auto_cooldown, autonomous
     if auto_cooldown > 0:
-        auto_cooldown -= 1
+        auto_cooldown = max(0, auto_cooldown - delta)
 
     key = keyboard.getKey()
     if not autonomous:
