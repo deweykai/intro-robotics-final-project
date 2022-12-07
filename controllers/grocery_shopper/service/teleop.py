@@ -4,7 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 auto_cooldown = 0
-autonomous = True
+autonomous = False
 grip_open = False
 precision_mode = False
 
@@ -83,7 +83,11 @@ def update(delta):
     elif key == ord('2'):
         arm_pub.publish('lower')
     elif key == ord('3'):
+        arm_pub.publish('pre-basket')
+    elif key == ord('4'):
         arm_pub.publish('basket')
+    elif key == ord('5'):
+        arm_pub.publish('post-basket')
     elif key == ord('R'):
         if auto_cooldown > 0:
             logger.debug('autonomous switching cooldown not finished')

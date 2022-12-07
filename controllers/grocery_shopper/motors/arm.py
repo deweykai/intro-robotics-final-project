@@ -12,6 +12,7 @@ for part in arm_parts:
     max_vel = robot.robot_parts[part].getMaxVelocity()
     robot.robot_parts[part].setVelocity(max_vel / 5.0)
 
+
 def upper_height():
     # object is always on shelf 2 or 3
     robot.robot_parts['arm_1_joint'].setPosition(np.pi / 2)
@@ -31,7 +32,7 @@ def lower_height():
     robot.robot_parts['arm_3_joint'].setPosition(-np.pi / 2)  # 1.5
     robot.robot_parts['arm_4_joint'].setPosition(0)
     robot.robot_parts['arm_5_joint'].setPosition(0)
-    robot.robot_parts['arm_6_joint'].setPosition(0.7)
+    robot.robot_parts['arm_6_joint'].setPosition(0.6)
     robot.robot_parts['arm_7_joint'].setPosition(0)
     robot.robot_parts['torso_lift_joint'].setPosition(0.35)  # range 0 - 0.35
 
@@ -47,13 +48,28 @@ def above_basket():
     robot.robot_parts['torso_lift_joint'].setPosition(0)  # range 0 - 0.35
 
 
+height = 'lower'
+
+
 @bus.subscribe('/bot/cmd_arm', str)
 def cmd_arm(position):
+    print(f'arm pos = {position}')
+    global height
     if position == 'upper':
+        height = 'upper'
         upper_height()
     elif position == 'lower':
+        height = 'lower'
         lower_height()
+    elif position == 'pre-basket':
+        if height == 'lower':
+            robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
+        else:
+            robot.robot_parts['arm_7_joint'].setPosition(0)
     elif position == 'basket':
         above_basket()
+        robot.robot_parts['arm_7_joint'].setPosition(0)
+    elif position == 'post-basket':
+        robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
     else:
         logger.error('unknown arm position')

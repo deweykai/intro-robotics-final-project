@@ -45,10 +45,10 @@ class FaceTowards(pyt.behaviour.Behaviour):
         speed = ease_out_quad(np.abs(bearing_error)) * 5.0
 
         if bearing_error > 0:
-            left_wheel_pub.publish(-speed)
+            left_wheel_pub.publish(speed * 0.1)
             right_wheel_pub.publish(speed)
         else:
-            left_wheel_pub.publish(speed)
+            left_wheel_pub.publish(speed * 0.1)
             right_wheel_pub.publish(-speed)
 
         return Status.RUNNING

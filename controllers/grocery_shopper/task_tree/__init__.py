@@ -48,16 +48,10 @@ wander_tree = Sequence(children=[
     DriveTo(get_position=lambda: [-5, 2]),
 ])
 
-retrieve_object_tree = Sequence(children=[
-    # object_visible,
-    find_object.FindObject(),
-    # drive to object
-    DriveTo(get_position=in_front_of_object),
-    # face towards target
-    FaceTowards(get_target=lambda: find_object.object_location),
 
+close_range_grab_object = Sequence(name='grab close range', children=[
     # check object position again
-    find_object.FindObject(limit_range=False),
+    find_object.FindObject(close_range=True),
     FaceTowards(get_target=lambda: find_object.object_location),
 
     # ready arm and gripper to grab target
@@ -81,7 +75,7 @@ retrieve_object_tree = Sequence(children=[
     DriveForwards(speed=1.0, cond=lambda: object_dist < 0.9),
     FaceTowards(get_target=lambda: find_object.object_location),
 
-    DriveForwards(speed=1.0, cond=lambda: object_dist < 0.8),
+    DriveForwards(speed=1.0, cond=lambda: object_dist < 0.7),
 
     # grab object
     DriveForwards(speed=0.0),
@@ -93,14 +87,30 @@ retrieve_object_tree = Sequence(children=[
     Timer(ms=10_000),
 
     # put object in basket
-    SetArms(state='basket'),
     DriveForwards(speed=0.0),
+    SetArms(state='pre-basket'),
     Timer(ms=5_000),
+
+    SetArms(state='basket'),
+    Timer(ms=5_000),
+
+    SetArms(state='post-basket'),
+    Timer(ms=1_000),
     SetGripper(open_state=True),
 ])
 
+long_range_grab_object = Sequence(name='grab long range', children=[
+    # object_visible,
+    find_object.FindObject(close_range=False),
+    # drive to object
+    DriveTo(get_position=in_front_of_object),
+    # face towards target
+    FaceTowards(get_target=lambda: find_object.object_location),
+])
+
 root = Selector(children=[
-    retrieve_object_tree,
+    close_range_grab_object,
+    long_range_grab_object,
     wander_tree
 ])
 

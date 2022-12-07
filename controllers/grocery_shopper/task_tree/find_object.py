@@ -35,21 +35,35 @@ def camera_data(objects):
 
 
 class FindObject(pyt.behaviour.Behaviour):
-    def __init__(self, limit_range=True):
+    def __init__(self, close_range=False):
         super().__init__()
-        self.limit_range = limit_range
+        self.close_range = close_range
 
     def update(self):
         global object_location
 
         for obj in detected_objects:
             dist = np.linalg.norm(obj.position)
-            if not self.limit_range or (dist > 5 and dist < 10):
-                world_pos = object_to_world(
-                    [pose_x, pose_y, pose_theta], obj.position)
+            world_pos = object_to_world(
+                [pose_x, pose_y, pose_theta], obj.position)
 
-                if world_pos[2] > -0.85:
-                    # ignore objects on floor
+            print('== DATA ==')
+            print(obj.position)
+            print(dist)
+            print(abs(pose_x - world_pos[0]))
+            # ignore objects on floor
+            if world_pos[2] < -0.85:
+                continue
+
+            if not self.close_range:
+                if dist > 5 and dist < 10:
+                    object_location = world_pos
+
+                    logger.info(f'target found at {object_location}')
+                    return Status.SUCCESS
+
+            if self.close_range:
+                if dist < 3 and abs(pose_x - world_pos[0]) < 0.30 and dist > 1:
                     object_location = world_pos
 
                     logger.info(f'target found at {object_location}')

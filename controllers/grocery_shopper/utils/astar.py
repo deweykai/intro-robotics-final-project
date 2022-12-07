@@ -17,7 +17,7 @@ import logging
 logger = logging.getLogger(__name__)
 # logger.setLevel(logging.DEBUG)
 
-CONV_SIZE = 10
+CONV_SIZE = 15
 
 # display waypoints on map
 DEBUG = False
