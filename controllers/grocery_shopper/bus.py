@@ -125,6 +125,23 @@ def describe_topic(topic_name: str):
         print(f'- {name}')
 
 
+def describe_node(node_name: str):
+    print('=' * 3, f'NODE: {node_name}', '=' * 3)
+
+    print('PUBLISHERS:')
+    for topic_name in topics:
+        topic = topics[topic_name]
+        if node_name in topic.publishers:
+            print(f'- {topic_name}')
+
+    print('\n')
+    print('SUBSCRIBERS:')
+    for topic_name in topics:
+        topic = topics[topic_name]
+        if node_name in topic.observers:
+            print(f'- {topic_name}')
+
+
 def get_topics():
     return [topic for topic in topics]
 

@@ -18,6 +18,7 @@ import task_tree as _
 
 # Main Loop
 tick_cmd_publisher = bus.Publisher('/bot/cmd_tick', int)
+bus.describe_node('task_tree.find_object')
 
 while robot.step(timestep) != -1:
     tick_cmd_publisher.publish(timestep)
