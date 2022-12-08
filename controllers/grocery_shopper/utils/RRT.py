@@ -140,7 +140,7 @@ def rrt(state_bounds, state_is_valid, starting_point, goal_point, K, delta_q):
         # if the goal point is close enough to a node, return early
         if goal_point is not None:
             if np.linalg.norm(get_nearest_vertex(node_list, goal_point).point - goal_point) < threshold:
-                return node_list
+                return (node_list, True)
             if random.random() < 0.05:
                 target = goal_point
 
@@ -152,7 +152,7 @@ def rrt(state_bounds, state_is_valid, starting_point, goal_point, K, delta_q):
             new_node.path_from_parent = path
             node_list.append(new_node)
 
-    return node_list
+    return (node_list, False)
 
 
 def smooth_path(path, cspace):
@@ -198,12 +198,18 @@ def plan_path(start_pos, target_pos: list[float]):
     bounds = np.array([[0, 360], [0, 360]])
     state_is_valid = get_state_is_valid(adj_map)
 
-    nodes = rrt(bounds, state_is_valid, start_p,
-                end_p, K, 10)
+    nodes, reached_target = rrt(bounds, state_is_valid, start_p,
+                                end_p, K, 10)
+
+    if not reached_target:
+        logger.error(f'could not make path to target {target_pos}')
+        return None
 
     path = []
 
     goal_node = get_nearest_vertex(nodes, end_p)
+    print(target_pos)
+    print(end_p, goal_node.point)
 
     while goal_node is not None:
         path.append(goal_node.point)
@@ -212,7 +218,9 @@ def plan_path(start_pos, target_pos: list[float]):
     path = list(reversed(path))
     #path = smooth_path(path, adj_map)
 
-    fig, axes = plt.subplots(nrows=2)
+    if DEBUG:
+        fig, axes = plt.subplots(nrows=2)
+        plt.gca().invert_yaxis()
 
     if DEBUG:
         axes[0].imshow(adj_map)
@@ -230,7 +238,7 @@ def plan_path(start_pos, target_pos: list[float]):
         plt.show()
 
     # ignore the starting waypoint
-    waypoints = [mapping.coords_map_to_world(pos) for pos in path][1:]
+    waypoints = [mapping.coords_map_to_world(pos) for pos in path]
     return waypoints
 
 
