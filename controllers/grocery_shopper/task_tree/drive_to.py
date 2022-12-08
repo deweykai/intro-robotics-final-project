@@ -3,12 +3,13 @@ from py_trees.common import Status
 import numpy as np
 import logging
 import bus
-from utils.astar import plan_path
+#from utils.astar import plan_path
+from utils.RRT import plan_path
 import robot
 from utils.ease_func import ease_out_exp, ease_out_quad
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.DEBUG)
 
 POSITION_THRESHOLD = 0.1
 left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)

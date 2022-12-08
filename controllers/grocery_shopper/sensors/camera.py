@@ -6,6 +6,8 @@ from typing import Sequence
 
 logger = logging.getLogger(__name__)
 
+pub_detected_objects = bus.Publisher('/bot/sensor/camera_rec', list)
+
 color_ranges = []
 
 
@@ -57,9 +59,6 @@ def filter_colors(objects: Sequence[RecognitionObject]) -> Sequence[RecognitionO
 
 def detect_filtered_objects() -> Sequence[RecognitionObject]:
     return filter_colors(detect_objects())
-
-
-pub_detected_objects = bus.Publisher('/bot/sensor/camera_rec', list)
 
 
 add_color_range_to_detect(lower_bound=np.array(
