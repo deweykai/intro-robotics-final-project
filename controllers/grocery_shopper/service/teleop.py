@@ -1,4 +1,4 @@
-from robot import keyboard, MAX_SPEED
+from robot import robot, timestep, MAX_SPEED
 import bus
 import logging
 
@@ -7,6 +7,11 @@ auto_cooldown = 0
 autonomous = False
 grip_open = False
 precision_mode = False
+
+# We are using a keyboard to remote control the robot
+keyboard = robot.getKeyboard()
+keyboard.enable(timestep)
+
 
 left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)
 right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)

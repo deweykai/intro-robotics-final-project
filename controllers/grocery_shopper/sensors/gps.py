@@ -1,8 +1,14 @@
-from robot import gps, compass
+from robot import robot, timestep
 import bus
 import numpy as np
 
 pub = bus.Publisher('/bot/pose', np.ndarray)
+
+# Enable GPS and compass localization
+gps = robot.getDevice("gps")
+gps.enable(timestep)
+compass = robot.getDevice("compass")
+compass.enable(timestep)
 
 
 @bus.subscribe('/bot/cmd_tick', int)

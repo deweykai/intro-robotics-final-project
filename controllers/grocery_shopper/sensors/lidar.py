@@ -1,7 +1,12 @@
-from robot import lidar
+from robot import robot, timestep
 import bus
 import math
 import numpy as np
+
+# Enable LiDAR
+lidar = robot.getDevice('Hokuyo URG-04LX-UG01')
+lidar.enable(timestep)
+lidar.enablePointCloud()
 
 LIDAR_ANGLE_BINS = 667
 # The sensor is so low it often hits the ground

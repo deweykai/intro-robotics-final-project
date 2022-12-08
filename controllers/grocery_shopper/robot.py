@@ -63,25 +63,6 @@ right_gripper_enc = robot.getDevice("gripper_right_finger_joint_sensor")
 left_gripper_enc.enable(timestep)
 right_gripper_enc.enable(timestep)
 
-# Enable Camera
-camera = robot.getDevice('camera')
-camera.enable(timestep)
-camera.recognitionEnable(timestep)
-
-# Enable GPS and compass localization
-gps = robot.getDevice("gps")
-gps.enable(timestep)
-compass = robot.getDevice("compass")
-compass.enable(timestep)
-
-# Enable LiDAR
-lidar = robot.getDevice('Hokuyo URG-04LX-UG01')
-lidar.enable(timestep)
-lidar.enablePointCloud()
-
-# We are using a keyboard to remote control the robot
-keyboard = robot.getKeyboard()
-keyboard.enable(timestep)
 
 # Enable display
 display = robot.getDevice("display")

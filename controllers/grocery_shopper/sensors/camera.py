@@ -1,8 +1,14 @@
-from robot import camera
+from robot import robot, timestep
 import bus
 import logging
 import numpy as np
 from typing import Sequence
+
+# Enable Camera
+camera = robot.getDevice('camera')
+camera.enable(timestep)
+camera.recognitionEnable(timestep)
+
 
 logger = logging.getLogger(__name__)
 
