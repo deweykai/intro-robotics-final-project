@@ -18,8 +18,10 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/project
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.009142044905503357 -0.999756028932213 -0.020107352601415326 5.429137420802919
-  position -15.764033421226067 -0.19010074644463218 14.09859051885348
+  orientation 0.004143776003232211 -0.9999487015914333 -0.009242472939724454 5.439283055833579
+  position -15.154510041958327 0.030886488142929047 13.825089138186042
+  follow "TIAGo Steel"
+  followType "None"
 }
 TexturedBackground {
   texture "empty_office"
@@ -1181,6 +1183,7 @@ TiagoSteel {
     GPS {
     }
     HokuyoUrg04lxug01 {
+      rotation 0 1 0 -0.05
     }
   ]
 }

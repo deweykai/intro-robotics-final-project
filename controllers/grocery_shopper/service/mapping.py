@@ -35,6 +35,7 @@ bus.Subscriber('/bot/pose', np.ndarray, gps_data)
 
 logger = logging.getLogger(__name__)
 
+LOCKED = True  # prevent overwriting saved map file
 DISPLAY_DIM = 360
 
 WORLD_MIN_X = -15
@@ -114,6 +115,8 @@ class ManualMapper:
         from robot import display
         logger.info('Loading map...')
         self.raw_map = np.load('raw_map.npy')
+        # plt.imshow(self.raw_map)
+        # plt.show()
         for y in range(DISPLAY_DIM):
             for x in range(DISPLAY_DIM):
                 g = self.raw_map[y][x]
@@ -129,16 +132,23 @@ class ManualMapper:
     def save(self):
         """Save internal raw map data to file `raw_map.npy`"""
 
-        logger.info('Saving map...')
-        np.save('raw_map.npy', self.raw_map)
+        if not LOCKED:
+            logger.info('Saving map...')
+            np.save('raw_map.npy', self.raw_map)
 
 
 mapper = ManualMapper()
-mapper.load()
 
 
-def update_callback(readings):
+@bus.subscribe('/bot/cmd_map', str)
+def cmd_map(cmd):
+    if cmd == 'load':
+        mapper.load()
+
+    if cmd == 'save':
+        mapper.save()
+
+
+@bus.subscribe('/bot/sensor/lidar', list)
+def update_map(readings):
     mapper.update(readings)
-
-
-bus.Subscriber('/bot/sensor/lidar', list, update_callback)

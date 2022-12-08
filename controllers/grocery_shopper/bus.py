@@ -1,6 +1,6 @@
 import sys
 import os
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, Generic
 T = TypeVar('T')
 
 
@@ -27,7 +27,7 @@ def generate_name():
     return fn
 
 
-class Topic:
+class Topic(Generic[T]):
     def __init__(self, topic_name: str, topic_type: type):
         self.topic_name = topic_name
         self.topic_type = topic_type
@@ -65,7 +65,7 @@ class Topic:
             self.observers[name](data)
 
 
-class Publisher:
+class Publisher(Generic[T]):
     def __init__(self, topic_name: str, topic_type: type, name=None):
         if name is None:
             name = generate_name()
@@ -91,7 +91,7 @@ class Publisher:
 topics = {}
 
 
-class Subscriber:
+class Subscriber(Generic[T]):
     def __init__(self, topic_name, topic_type: type, callback: Callable[[T], None], name=None):
         if name is None:
             name = generate_name()

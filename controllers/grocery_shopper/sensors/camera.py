@@ -7,6 +7,7 @@ from typing import Sequence
 logger = logging.getLogger(__name__)
 
 pub_detected_objects = bus.Publisher('/bot/sensor/camera_rec', list)
+pub_landmarks = bus.Publisher('/bot/sensor/camera_landmark', list)
 
 color_ranges = []
 
@@ -69,6 +70,9 @@ add_color_range_to_detect(lower_bound=np.array(
 def update_camera(_):
     filtered_objects = detect_filtered_objects()
     pub_detected_objects.publish(filtered_objects)
+
+    objects = detect_objects()
+    pub_landmarks.publish(objects)
 
 
 #bus.inspect('/bot/sensor/camera_rec', list)

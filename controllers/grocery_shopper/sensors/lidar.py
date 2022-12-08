@@ -5,7 +5,7 @@ import numpy as np
 
 LIDAR_ANGLE_BINS = 667
 # The sensor is so low it often hits the ground
-LIDAR_SENSOR_MAX_RANGE = 2  # Meter
+LIDAR_SENSOR_MAX_RANGE = 8  # Meter
 LIDAR_ANGLE_RANGE = math.radians(240)
 
 lidar_offsets = np.linspace(

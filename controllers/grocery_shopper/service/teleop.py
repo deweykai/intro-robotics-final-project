@@ -12,6 +12,8 @@ left_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/left', float)
 right_wheel_pub = bus.Publisher('/bot/wheel/cmd_vel/right', float)
 autonomous_pub = bus.Publisher('/bot/cmd_auto', bool)
 gripper_pub = bus.Publisher('/bot/cmd_gripper', bool)
+mapper_pub = bus.Publisher('/bot/cmd_map', str)
+mapper_pub.publish('load')
 arm_pub = bus.Publisher('/bot/cmd_arm', str)
 autonomous_pub.publish(autonomous)
 gripper_pub.publish(True)
@@ -66,11 +68,9 @@ def update(delta):
         right_wheel_pub.publish(vR)
 
     if key == ord('S'):
-        pass
-        # mapping.mapper.save()
+        mapper_pub.publish('save')
     elif key == ord('L'):
-        pass
-        # mapping.mapper.load()
+        mapper_pub.publish('load')
     elif key == ord('A'):
         if auto_cooldown > 0:
             logger.debug('autonomous switching cooldown not finished')
