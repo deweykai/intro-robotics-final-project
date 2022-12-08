@@ -208,8 +208,6 @@ def plan_path(start_pos, target_pos: list[float]):
     path = []
 
     goal_node = get_nearest_vertex(nodes, end_p)
-    print(target_pos)
-    print(end_p, goal_node.point)
 
     while goal_node is not None:
         path.append(goal_node.point)

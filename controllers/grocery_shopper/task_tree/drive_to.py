@@ -34,6 +34,9 @@ class IKController:
         if self.target_pos is None:
             return True
 
+        if self.waypoints is None:
+            return False
+
         if len(self.waypoints) == 0:
             return True
 
@@ -50,7 +53,9 @@ class IKController:
         else:
             # logger.warning('pathfinding disabled')
             # self.waypoints = [target_pos]  # navigation.plan_path(target_pos)
-            self.waypoints = plan_path([pose_x, pose_y], target_pos)[1:]
+            self.waypoints = plan_path([pose_x, pose_y], target_pos)
+            if self.waypoints is not None and len(self.waypoints) > 1:
+                self.waypoints = self.waypoints[1:]
         self.target_pos = target_pos
 
     def get_target(self) -> list[float]:
@@ -153,6 +158,9 @@ class DriveTo(pyt.behaviour.Behaviour):
         ])
 
         ik_controller.update()
+
+        if ik_controller.waypoints is None:
+            return Status.FAILURE
 
         if ik_controller.target_reached():
             logger.info('target reached')
