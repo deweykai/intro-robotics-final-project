@@ -130,7 +130,7 @@ long_range_grab_object = Sequence(name='grab long range', children=[
 ])
 
 root = Selector(children=[
-    # close_range_grab_object,
+    close_range_grab_object,
     long_range_grab_object,
     wander_tree
 ])

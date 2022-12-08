@@ -40,5 +40,5 @@ file_handler_info.setFormatter(logging.Formatter(
     "[%(asctime)s] [%(levelname)8s] - %(message)s (%(filename)s:%(lineno)d)"))
 file_handler_info.setLevel(logging.INFO)
 
-logging.basicConfig(level=logging.INFO, handlers=[
+logging.basicConfig(level=logging.WARNING, handlers=[
                     console_handler, file_handler_info, file_handler_debug])

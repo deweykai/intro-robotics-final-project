@@ -12,6 +12,8 @@ object_location = [0, 0]
 
 pose_x, pose_y, pose_theta = 0, 0, 0
 
+pub_detect_object = bus.Publisher('/bot/task/detect_object', np.ndarray)
+
 
 @bus.subscribe('/bot/pose', np.ndarray)
 def gps_data(data):
@@ -55,14 +57,14 @@ class FindObject(pyt.behaviour.Behaviour):
                 if dist > 5 and dist < 10:
                     object_location = world_pos
 
-                    logger.info(f'target found at {object_location}')
+                    pub_detect_object.publish(object_location)
                     return Status.SUCCESS
 
             if self.close_range:
                 if dist < 3 and abs(pose_x - world_pos[0]) < 0.30 and dist > 1:
                     object_location = world_pos
 
-                    logger.info(f'target found at {object_location}')
+                    pub_detect_object.publish(object_location)
                     return Status.SUCCESS
 
         # find tree
