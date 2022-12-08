@@ -6,7 +6,7 @@ import bus
 from utils.object_to_world import object_to_world
 
 logger = logging.getLogger(__name__)
-# logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 object_location = [0, 0]
 

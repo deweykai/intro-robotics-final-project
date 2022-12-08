@@ -49,6 +49,7 @@ def above_basket():
 
 
 def standby():
+    robot.robot_parts['torso_lift_joint'].setPosition(0)  # range 0 - 0.35
     robot.robot_parts['arm_1_joint'].setPosition(0.7)
     robot.robot_parts['arm_2_joint'].setPosition(1.02)  # -1.5 - 1.02
     robot.robot_parts['arm_3_joint'].setPosition(-3.16)  # 1.5

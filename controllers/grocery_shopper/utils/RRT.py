@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 CONV_SIZE = 15
 
-DEBUG = True
+DEBUG = False
 
 ###############################################################################
 # Base Code
@@ -199,7 +199,7 @@ def plan_path(start_pos, target_pos: list[float]):
     state_is_valid = get_state_is_valid(adj_map)
 
     nodes = rrt(bounds, state_is_valid, start_p,
-                end_p, K, np.linalg.norm(bounds) / 20)
+                end_p, K, 10)
 
     path = []
 
