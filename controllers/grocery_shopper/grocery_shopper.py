@@ -15,7 +15,6 @@ import service.teleop as _
 import service.mapping as _
 import task_tree as _
 
-
 # Main Loop
 tick_cmd_publisher = bus.Publisher('/bot/cmd_tick', int)
 

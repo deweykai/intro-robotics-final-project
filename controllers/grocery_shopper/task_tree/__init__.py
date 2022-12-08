@@ -39,8 +39,6 @@ def in_front_of_object():
     return [target_x, target_y]
 
 
-
-
 wander_positions = [
     [-5, 5.65],
     [13.1, 5.65],
@@ -52,11 +50,14 @@ wander_positions = [
     [-5, 2],
 ]
 drive_index = 0
+
+
 class UpdateWanderPosition(pyt.behaviour.Behaviour):
     def update(self):
         global drive_index
         drive_index = (drive_index + 1) % len(wander_positions)
         return Status.SUCCESS
+
 
 wander_tree = Sequence(children=[
     DriveTo(get_position=lambda: wander_positions[drive_index]),
@@ -112,7 +113,7 @@ close_range_grab_object = Sequence(name='grab close range', children=[
     Timer(ms=5_000),
 
     SetArms(state='post-basket'),
-    Timer(ms=1_000),
+    Timer(ms=3_000),
     SetGripper(open_state=True),
     Timer(ms=5_000),
     SetArms(state='standby'),

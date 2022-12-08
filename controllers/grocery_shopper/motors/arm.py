@@ -74,7 +74,7 @@ def cmd_arm(position):
         lower_height()
     elif position == 'pre-basket':
         if height == 'lower':
-            robot.robot_parts['arm_7_joint'].setPosition(np.pi / 2)
+            robot.robot_parts['arm_7_joint'].setPosition(-np.pi / 2)
         else:
             robot.robot_parts['arm_7_joint'].setPosition(0)
     elif position == 'basket':
