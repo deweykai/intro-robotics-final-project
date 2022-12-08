@@ -50,7 +50,7 @@ class IKController:
         else:
             # logger.warning('pathfinding disabled')
             # self.waypoints = [target_pos]  # navigation.plan_path(target_pos)
-            self.waypoints = plan_path([pose_x, pose_y], target_pos)
+            self.waypoints = plan_path([pose_x, pose_y], target_pos)[1:]
         self.target_pos = target_pos
 
     def get_target(self) -> list[float]:

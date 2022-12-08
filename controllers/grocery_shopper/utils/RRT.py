@@ -160,16 +160,19 @@ def smooth_path(path, cspace):
         return []
 
     current = path.pop(0)
+    previous = None
+    next = path.pop(0)
     new_path = [current]
 
     while len(path) > 1:
+        previous = next
         next = path.pop(0)
         dist = np.linalg.norm(current - next)
         line = np.linspace(current, next, int(dist+1))
         for x, y in line:
             if cspace[int(y)][int(x)] == 1:
-                new_path.append(next)
-                current = next
+                new_path.append(previous)
+                current = previous
                 logger.debug(f'hit at {next}')
                 break
 
@@ -191,12 +194,12 @@ def plan_path(start_pos, target_pos: list[float]):
                          boundary='fill', fillvalue=1)
     adj_map = (adj_map > (CONV_SIZE**2 * 0.01)) * 1
 
-    K = 250  # Feel free to adjust as desired
+    K = 1_000  # Feel free to adjust as desired
     bounds = np.array([[0, 360], [0, 360]])
     state_is_valid = get_state_is_valid(adj_map)
 
     nodes = rrt(bounds, state_is_valid, start_p,
-                end_p, K, np.linalg.norm(bounds/10.))
+                end_p, K, np.linalg.norm(bounds) / 20)
 
     path = []
 
@@ -208,14 +211,22 @@ def plan_path(start_pos, target_pos: list[float]):
 
     path = list(reversed(path))
     #path = smooth_path(path, adj_map)
-    print(path)
+
+    fig, axes = plt.subplots(nrows=2)
 
     if DEBUG:
-        plt.imshow(adj_map)
-        plt.gca().invert_yaxis()
+        axes[0].imshow(adj_map)
         x = np.array([a[0] for a in path])
         y = np.array([a[1] for a in path])
-        plt.scatter(x, y)
+        axes[0].scatter(x, y)
+
+    path = smooth_path(path, adj_map)
+
+    if DEBUG:
+        axes[1].imshow(adj_map)
+        x = np.array([a[0] for a in path])
+        y = np.array([a[1] for a in path])
+        axes[1].scatter(x, y)
         plt.show()
 
     # ignore the starting waypoint
