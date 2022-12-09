@@ -152,6 +152,9 @@ root = Selector(children=[
     wander_tree
 ])
 
+# just wander for generating map
+# root = wander_tree
+
 root.setup()
 
 
