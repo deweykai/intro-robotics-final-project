@@ -12,6 +12,22 @@ This controller can only be run within webots.
 
 This controller takes somewhere between 20-40 minutes to collect all
 objects (or drop them on the floor).
+
+Issues:
+The sometimes a cube falls on the floor. In that case we give up on it.
+
+Sometimes a cube gets stuck in the grabber. It doesn't cause a problem
+since it falls out eventually, but it usually falls out onto the floor.
+
+Rarely the robot gets stuck driving to a waypoint and goes in circles.
+You can either wait a while or go into manual mode to move the robot away
+which usually fixes the problem.
+
+Rarely the robots arm gets stuck on upper shelf, lifting the wheels
+off the ground so the robot can't move. Press "1" to move the arm up which
+should fix the problem.
+
+There is a cube floating in the void outside the market. Ignore it.
 """
 
 from robot import *

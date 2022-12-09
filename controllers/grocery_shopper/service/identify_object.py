@@ -2,6 +2,9 @@
 
 This service receives an event when the robot targets an object.
 It then associates it with an id based on its location, then prints it. 
+
+Since objects are identified based on location, a single cube can be given
+multiple ids.
 """
 import numpy as np
 import bus
