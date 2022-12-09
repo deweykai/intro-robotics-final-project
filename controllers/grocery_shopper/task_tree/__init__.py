@@ -10,6 +10,9 @@ appropriate position to trigger the previous branch.
 - wander: just drive around to find objects.
 
 The `wander` branch can be used on its own to help generate a map of the world.
+
+This module create a bunch of different behaviour nodes that it needs to
+function.
 """
 
 from .drive_to import DriveTo

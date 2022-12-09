@@ -4,6 +4,8 @@ This module does path planning and decision making.
 
 This file provides:
 - plan_path(start_pos, target_pos) -> waypoints
+
+Path finding is called in task_tree/drive_to.py
 """
 import numpy as np
 from service import mapping

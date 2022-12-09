@@ -23,8 +23,8 @@ import bus
 import logging
 
 logger = logging.getLogger(__name__)
-auto_cooldown = 0
-autonomous = False
+auto_cooldown = 0 # cooldown for toggle keys like autonomous mode and precision mode
+autonomous = True
 grip_open = False
 precision_mode = False
 
