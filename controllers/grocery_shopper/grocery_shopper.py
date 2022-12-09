@@ -9,6 +9,9 @@ This controller requires the following libraries to be installed:
 - py_trees
 
 This controller can only be run within webots.
+
+This controller takes somewhere between 20-40 minutes to collect all
+objects (or drop them on the floor).
 """
 
 from robot import *
