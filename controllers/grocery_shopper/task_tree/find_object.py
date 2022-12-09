@@ -61,7 +61,7 @@ class FindObject(pyt.behaviour.Behaviour):
                     return Status.SUCCESS
 
             if self.close_range:
-                if dist < 3 and abs(pose_x - world_pos[0]) < 0.30 and dist > 1:
+                if dist < 3 and abs(pose_x - world_pos[0]) < 0.30 and dist > 1.3:
                     object_location = world_pos
 
                     pub_detect_object.publish(object_location)
