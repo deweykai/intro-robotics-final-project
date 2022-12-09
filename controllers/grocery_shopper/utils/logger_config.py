@@ -10,6 +10,9 @@ Also it logs to a log file outside of webots:
 import logging
 import sys
 
+DEFAULT_LOG_LEVEL = logging.WARNING
+#DEFAULT_LOG_LEVEL = logging.INFO
+
 
 class ColorFormatter(logging.Formatter):
     grey = "\x1b[38;20m"
@@ -49,5 +52,5 @@ file_handler_info.setFormatter(logging.Formatter(
     "[%(asctime)s] [%(levelname)8s] - %(message)s (%(filename)s:%(lineno)d)"))
 file_handler_info.setLevel(logging.INFO)
 
-logging.basicConfig(level=logging.WARNING, handlers=[
+logging.basicConfig(level=DEFAULT_LOG_LEVEL, handlers=[
                     console_handler, file_handler_info, file_handler_debug])
