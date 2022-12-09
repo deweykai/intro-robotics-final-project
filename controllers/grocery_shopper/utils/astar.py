@@ -1,12 +1,9 @@
-"""Planning and navigation
+"""A star path planning
 
 This module does path planning and decision making.
 
 This file provides:
-    * waypoints[] - a list of (x,y) coordinates to the robots destination
-
-This module depends:
-    * mapping - map data to plan a path
+- plan_path(start_pos, target_pos) -> waypoints
 """
 import numpy as np
 from service import mapping

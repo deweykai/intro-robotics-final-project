@@ -1,4 +1,8 @@
-"""Completely unusable"""
+"""Odometry
+
+This is completely unusable. Most likely due to the issues the robot
+has with turning.
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np

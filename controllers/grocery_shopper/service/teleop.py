@@ -1,3 +1,23 @@
+"""Manual controls
+
+This service takes keyboard input to do a lot of things. 
+Some functionality is disabled when in autonomous mode.
+
+Manual mode exclusive:
+- Drive robot with arrow keys.
+
+Other things:
+- "A" to toggle autonomous mode.
+- 1-5 to set the arm position. (upper, lower, pre-basket, basket, post-basket)
+- "R" toggle grabber.
+- "P" toggle precision mode, sets max speed for manual controls to 1/10.
+- "S" save map
+- "L" load map
+
+
+Also a lot of initialization code is in this module for some reason. 
+"""
+
 from robot import robot, timestep, MAX_SPEED
 import bus
 import logging

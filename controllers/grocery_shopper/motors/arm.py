@@ -1,3 +1,18 @@
+"""Arm motors
+
+Provides hardcoded arm positions for various tasks.
+
+There are two heights (upper, lower) coresponding to the two shelf heights
+that all target objects are located at.
+
+There several positions for moving an object into the basket.
+`pre-basket` twists the arm to help prevent dropping the object.
+`basket` moves the arm above the object. `post-basket` twists the arm 
+so the object can more easily fall into the basket.
+
+There is also a `standby` position used which tries to balance the weight
+of the robot so movement is more consistent.
+"""
 import robot
 import numpy as np
 import bus

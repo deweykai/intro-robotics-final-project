@@ -1,3 +1,8 @@
+"""Identify Object
+
+This service receives an event when the robot targets an object.
+It then associates it with an id based on its location, then prints it. 
+"""
 import numpy as np
 import bus
 import logging

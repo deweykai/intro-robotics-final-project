@@ -1,3 +1,7 @@
+"""Wheel motors
+
+Set the velocity of the wheels.
+"""
 import robot
 import bus
 

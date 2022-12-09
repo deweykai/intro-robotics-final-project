@@ -1,3 +1,8 @@
+"""GPS
+
+Publishes robot pose information.
+"""
+
 from robot import robot, timestep
 import bus
 import numpy as np

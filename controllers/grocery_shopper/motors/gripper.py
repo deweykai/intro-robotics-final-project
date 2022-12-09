@@ -1,3 +1,8 @@
+"""Gripper
+
+Open and close the robot gripper.
+"""
+
 import robot
 import bus
 

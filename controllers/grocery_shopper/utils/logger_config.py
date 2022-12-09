@@ -1,3 +1,12 @@
+"""Logging config
+
+This sets up some fancy logging colors that works with webots.
+This module only needs to be loaded to configure logging.
+
+Also it logs to a log file outside of webots:
+- controller_debug.log: logging information at debug level
+- controller_info.log: logging information at info level
+"""
 import logging
 import sys
 

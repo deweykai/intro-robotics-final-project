@@ -1,3 +1,17 @@
+"""Automation behaviour tree
+
+This system builds a behaviour tree to make the robot collect objects.
+
+There are three high level branches of the tree:
+- grab object: The robot sees an object close to it and takes steps to
+put it in its the basket.
+- goto object: The robot sees an object far away and drives to an
+appropriate position to trigger the previous branch.
+- wander: just drive around to find objects.
+
+The `wander` branch can be used on its own to help generate a map of the world.
+"""
+
 from .drive_to import DriveTo
 from .wait import Timer
 from . import find_object

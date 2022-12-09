@@ -1,3 +1,8 @@
+"""IKPY kinematics
+
+An attempt at using ikpy. It is incomplete.
+"""
+
 import numpy as np
 from ikpy.chain import Chain
 from ikpy.link import OriginLink, URDFLink

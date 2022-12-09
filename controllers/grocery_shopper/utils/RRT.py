@@ -1,3 +1,11 @@
+"""RRT path planning
+
+This module does path planning and decision making.
+The provided api is the same as astar.py so they are easy to swap.
+
+This file provides:
+- plan_path(start_pos, target_pos) -> waypoints
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 import math

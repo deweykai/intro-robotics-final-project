@@ -1,3 +1,11 @@
+"""Camera device
+
+This publishes camera recognition objects in two channels:
+- '/bot/sensor/camera_rec'
+This is a filtered list of recognition objects for target objects.
+- '/bot/sensor/camera_landmark'
+This is an unfiltered list recognition objects.
+"""
 from robot import robot, timestep
 import bus
 import logging
@@ -42,6 +50,13 @@ def check_if_color_in_range(bgr_tuple):
 
 
 class RecognitionObject:
+    """Used to store recognition objects.
+
+    This is basically a watered down version of what
+    `camera.getRecognitionObjects()` returns for the sake of not needing to
+    google the api.
+    """
+
     def __init__(self, position, orientation, color):
         self.position = position
         self.orientation = orientation

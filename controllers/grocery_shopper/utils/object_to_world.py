@@ -2,6 +2,10 @@ import numpy as np
 
 
 def object_to_world(robot_pose, object_pose):
+    """
+    Convert position returned from camera recognition to world coordinates.
+    """
+
     pose_x, pose_y, pose_theta = robot_pose
     obj_x, obj_y, obj_z = object_pose
     camera_offset = 0.08

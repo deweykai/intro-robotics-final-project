@@ -10,11 +10,6 @@ This module provides devices:
     * robot_parts - a dictionary of robot joints including head, torso, arm, wheel, and grippers.
     * left_gripper_enc - left gripper encoder
     * right_gripper_enc - right gripper encoder
-    * camera - instance of camera device
-    * gps - gps device
-    * compass - compass device
-    * lidar - instance of lidar sensor
-    * keyboard - receiver for keybord inputs
     * display - webots display device
 """
 

@@ -1,3 +1,8 @@
+"""Lidar
+
+Publishes lidar readings.
+"""
+
 from robot import robot, timestep
 import bus
 import math

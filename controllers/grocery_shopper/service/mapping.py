@@ -1,20 +1,17 @@
 """Webots mapping
 
 This module maintains a map of the webots world to be used by other modules.
+It also provides functionality to generate a map when the robot wanders
+around the map.
 
 This file provides variables:
     * map_data[a][b] - 2d array, 1 for obstacles and 0 for free space
     * map_width - width of map_data
     * map_height - height of map_data
-    * dirty - did map change this update cycle
 
 This file provides functions:
     * coords_map_to_world((a, b)): (x, y) - converts map indexes to world coordinates
     * coords_world_to_map((x, y)): (a, b) - converts world coordinates to map indexes
-
-This module depends on:
-    * vision - uses camera to generate map
-    * localization - to orient robot in map
 """
 
 import logging
@@ -135,6 +132,9 @@ class ManualMapper:
         if not LOCKED:
             logger.info('Saving map...')
             np.save('raw_map.npy', self.raw_map)
+        else:
+            logger.warning(
+                'Map cannot save because the mapping module is locked.')
 
 
 mapper = ManualMapper()
